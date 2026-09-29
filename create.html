@@ -1,1 +1,16 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Create Novel</title><link rel="stylesheet" href="css/jekyll.css"></head><body><header class="masthead"><div class="brand">☾ LIGHT NOVEL PARODY FACTORY</div><nav><a href="index.html">Factory</a><a href="library.html">Library</a></nav></header><main class="paper"><p class="eyebrow">THE MACHINE AWAITS</p><h1>Create Your Literary Mistake</h1><label>Genres</label><div id="genres" class="chips"></div><label>Chapters <output id="chapterOut">200</output></label><input id="chapters" type="range" min="200" max="1000" value="200"><p id="estimate" class="muted">~160,000 words</p><label>Parody intensity <output id="parodyOut">90%</output></label><input id="parody" type="range" min="0" max="100" value="90"><label>Novel title <span class="muted">(optional)</span></label><input id="title" placeholder="Leave blank for an unnecessarily long title"><button id="generate" class="button">GENERATE NOVEL</button><p id="status" class="status"></p></main><script src="js/storage.js"></script><script src="js/app.js"></script></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Factory · Build Novel</title><link rel="stylesheet" href="css/jekyll.css"></head>
+<body><header class="masthead"><div class="brand">☾ LIGHT NOVEL PARODY FACTORY</div><nav><a href="index.html">Factory</a><a href="library.html">Library</a></nav></header>
+<main class="factory-builder">
+<section class="builder-head"><p class="eyebrow">FACTORY WORKBENCH · WASM RANDOM ENGINE</p><h1>BUILD YOUR <em>PARODY</em></h1><p>Choose the ingredients. The Factory creates a blueprint first. Nothing becomes a chapter until you approve it.</p></section>
+<section class="glass-panel"><div class="panel-title"><span>01 · GENRE MATRIX</span><button class="mini" id="allGenres">SELECT ALL</button></div><div id="genres" class="card-grid"></div></section>
+<section class="glass-panel"><div class="panel-title"><span>02 · CHARACTER TROPES</span><button class="mini" id="allTropes">SELECT ALL</button></div><div id="tropes" class="card-grid"></div></section>
+<section class="glass-panel controls-grid">
+<div><label>PARODY PERCENTAGE <output id="parodyOut">90%</output></label><input id="parody" type="range" min="0" max="100" value="90"><div class="range-labels"><span>0 · SERIOUS</span><span>100 · ABSURD</span></div></div>
+<div><label>CHAPTER COUNT <output id="chapterOut">200</output></label><input id="chapters" type="range" min="200" max="1000" step="10" value="200"><div class="range-labels"><span>200</span><span>1000</span></div></div>
+</section>
+<section class="glass-panel"><label>NOVEL TITLE <span class="muted">OPTIONAL</span></label><input id="title" class="text-input" placeholder="Leave blank and let the machine embarrass itself"></section>
+<div class="generate-zone"><button id="blueprint" class="button big">BUILD BLUEPRINT <span>PREVIEW BEFORE GENERATION →</span></button><p id="status"></p></div>
+<section id="blueprintView"></section>
+</main>
+<script src="js/storage.js"></script><script src="js/app.js"></script></body></html>
