@@ -237,3 +237,80 @@ main{width:100%;min-width:0}
 @media(hover:none){
   .workspace-card:hover,.select-card:hover{transform:none}
 }
+
+
+/* =========================================================
+   UI UPGRADE — APP-LIKE EXPERIENCE
+   ========================================================= */
+:root{
+  --surface:rgba(255,255,255,.045);
+  --surface-strong:rgba(255,255,255,.075);
+  --gold-glow:rgba(201,166,106,.18);
+  --focus:#e2bd79;
+}
+body{
+  background:
+    radial-gradient(circle at 15% 0%,rgba(164,123,54,.13),transparent 28rem),
+    radial-gradient(circle at 85% 15%,rgba(201,166,106,.08),transparent 30rem),
+    radial-gradient(circle at 50% -10%,#332920,#11100e 62%);
+}
+.masthead{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(17,16,14,.78);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 8px 30px rgba(0,0,0,.18);
+}
+nav a{position:relative;padding:7px 0}
+nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--gold2);transition:right .2s ease}
+nav a:hover::after{right:0}
+.button,.workspace-card,.select-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease}
+.button:hover{transform:translateY(-2px);box-shadow:0 12px 30px var(--gold-glow)}
+.button:focus-visible,.mini:focus-visible,.select-card:focus-visible,.controls button:focus-visible,.reader-toolbar button:focus-visible,.workspace-card:focus-visible{
+  outline:2px solid var(--focus);
+  outline-offset:3px;
+}
+.button:active,.select-card:active{transform:translateY(0)}
+.paper{border:1px solid rgba(116,93,57,.25)}
+.workspace-card{background:rgba(255,255,255,.18)}
+.workspace-card:hover{box-shadow:0 15px 35px rgba(56,40,22,.16)}
+.glass-panel{position:relative;overflow:hidden}
+.glass-panel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.07),transparent 35%);
+}
+.glass-panel>*{position:relative;z-index:1}
+.reader-progress{position:fixed;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.06);z-index:200}
+.reader-progress span{display:block;height:100%;background:var(--gold2);box-shadow:0 0 12px rgba(201,166,106,.55);transition:width .25s ease}
+.reader-toolbar{
+  position:sticky;
+  top:80px;
+  z-index:50;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  background:linear-gradient(to bottom,rgba(17,16,14,.94),rgba(17,16,14,.7),transparent);
+  backdrop-filter:blur(8px);
+}
+.reader-tools-left,.reader-tools-right{display:flex;align-items:center;gap:8px}
+.reader-progress-label{font-size:9px;letter-spacing:2px;color:#8f806d}
+.reader-toolbar button{min-width:44px;min-height:40px}
+.reader-toolbar button:hover{box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.controls button:disabled{opacity:.3;cursor:not-allowed}
+.reader-error{text-align:center;padding:15vh 5vw}
+.novel-text{font-size:calc(clamp(18px,1.45vw,25px) * var(--reader-scale,1));transition:font-size .15s ease}
+@media(max-width:760px){
+  .masthead{position:relative}
+  .reader-toolbar{top:0;padding:8px 0}
+  .reader-tools-left{display:none}
+  .reader-tools-right{width:100%;display:grid;grid-template-columns:1fr 1fr 2fr}
+  .reader-tools-right button{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .button,.workspace-card,.select-card,.novel-text{transition:none}
+}
