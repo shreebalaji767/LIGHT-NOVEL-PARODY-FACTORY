@@ -375,3 +375,7 @@ html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.ma
 
 /* FACTORY 9.0 SEED CONTROLS */
 .seed-row{display:grid;gap:8px;margin:18px 0}.seed-controls{display:grid;grid-template-columns:1fr auto;gap:8px}.seed-controls .text-input{min-width:0}@media(max-width:560px){.seed-controls{grid-template-columns:1fr}.seed-controls .mini{width:100%}}
+
+
+/* Factory v11 accessibility and modern viewport polish */
+:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}button,a,input,textarea,select{touch-action:manipulation}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}@media (max-width:720px){.masthead{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.pwa-settings-button{bottom:max(16px,env(safe-area-inset-bottom));right:max(16px,env(safe-area-inset-right))}}
