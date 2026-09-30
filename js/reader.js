@@ -1,4 +1,4 @@
-/* LIGHT NOVEL PARODY FACTORY — READER 8.0 */
+/* LIGHT NOVEL PARODY FACTORY — READER 9.0 */
 const id=new URLSearchParams(location.search).get('id');
 let novel,index=0;
 const readerRoot=()=>document.getElementById('reader');
