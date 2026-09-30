@@ -1,4 +1,4 @@
-/* LIGHT NOVEL PARODY FACTORY — STORY ENGINE 5.0
+/* LIGHT NOVEL PARODY FACTORY — STORY ENGINE 5.1
    Procedural long-form engine with continuity, anti-repetition, pacing and safe persistence.
 */
 const AUTHOR='BLLSNVJ21';const GENRES=['Isekai','Fantasy','Action','Adventure','Romance','Comedy','Horror','Mystery','School','Villainess','Cultivation','Sci-Fi','Reincarnation','Game/System','Dungeon','Demon Lord','Slice of Life','Supernatural','Sports','Mecha','Magical Girl','Post-Apocalypse','Cyberpunk','Historical','Military','Cooking','Otome','Time Travel','Survival','Political Intrigue','Music','Western','Pirates','Steampunk','Urban Fantasy','Dark Fantasy'];
@@ -36,11 +36,11 @@ function makeBlueprint(){
  const title=box('title').value.trim()||makeTitle(), genres=selectedGenres.length?selectedGenres:['Fantasy'], tropes=selectedTropes.length?selectedTropes:['Accidental Hero'];
  const used=new Set(),chars=[];for(const role of ['PROTAGONIST','RIVAL','COMPANION','MENTOR']){let name;do{name=pick(NAMES)}while(used.has(name));used.add(name);chars.push({role,name,trope:pick(tropes)})}
  const locations=shuffle(LOCATION).slice(0,5),hooks=shuffle(CONFLICTS).slice(0,4);
- return {title,author:AUTHOR,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),settings:{...SETTINGS},characters:chars,locations,hooks,engineVersion:'5.0',created:Date.now()};
+ return {title,author:AUTHOR,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),settings:{...SETTINGS},characters:chars,locations,hooks,engineVersion:'5.1',created:Date.now()};
 }
 function renderBlueprint(bp){
  const root=box('blueprintView');
- root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 5.0</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing</p></div><span class="status-pill">READY</span></div><div class="bp-author"><span>AUTHOR</span><strong>BLLSNVJ21</strong></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
+ root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 5.1</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing</p></div><span class="status-pill">READY</span></div><div class="bp-author"><span>AUTHOR</span><strong>BLLSNVJ21</strong></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
  box('generate').onclick=()=>generate(bp);box('discard').onclick=()=>{root.innerHTML='';box('status').textContent='Blueprint discarded.'};
 }
 box('blueprint').onclick=()=>{box('status').textContent='Building story bible and continuity plan...';const bp=makeBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. The engine will prevent repetitive chapter construction.'};
@@ -91,16 +91,24 @@ function makeChapter(i,bp,state){
 }
 function charDetail(state,bp,s,pool,n){const a=pick(pool),b=pick(pool.filter(x=>x!==a));return n%2?s.char.name+' noticed '+a+' near '+s.loc+', while '+s.other.name+' connected it to '+b+'. The connection was incomplete, but incomplete information was still information.': 'The group compared notes. '+a+' mattered because '+s.other.name+' remembered '+b+'. Nobody had enough evidence to declare the theory correct, so they recorded it instead.'}
 function similarity(a,b){const A=new Set(String(a).toLowerCase().split(/\W+/).filter(x=>x.length>4)),B=new Set(String(b).toLowerCase().split(/\W+/).filter(x=>x.length>4));let inter=0;A.forEach(x=>B.has(x)&&inter++);return inter/Math.max(1,Math.min(A.size,B.size))}
+let generationCancelled=false;
+function addGenerationControls(){
+ const zone=document.querySelector('.generate-zone');if(!zone||document.getElementById('cancelGeneration'))return;
+ const b=document.createElement('button');b.id='cancelGeneration';b.className='text-button';b.textContent='STOP GENERATION';b.onclick=()=>{generationCancelled=true};
+ zone.appendChild(b);
+}
+addGenerationControls();
 async function generate(bp){
- const s=box('genStatus'),n=bp.chapters,state=createState(bp),novel={id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'5.0',antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true},stats:{words:0,regenerations:0}};
+ const s=box('genStatus'),n=bp.chapters,state=createState(bp),novel={id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'5.1',antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true},stats:{words:0,regenerations:0}};
  box('generate').disabled=true;box('discard').disabled=true;window.onbeforeunload=()=> 'Generation is in progress. Leave this page only if you want to stop it.';
  try{
   for(let i=1;i<=n;i++){
+   if(generationCancelled)throw new Error('Generation cancelled by user.');
    let chapter,attempt=0;
    do{chapter=makeChapter(i,bp,state);attempt++;}while(novel.generated.slice(-12).some(x=>similarity(x.text,chapter.text)>.72)&&attempt<5);
    if(attempt>1)novel.stats.regenerations+=attempt-1;
    novel.generated.push(chapter);
-   if(i%25===0){novel.stats.words=state.words;await saveNovel(novel);}
+   if(i%10===0){novel.stats.words=state.words;novel.checkpoint={chapter:i,state:JSON.parse(JSON.stringify(state))};await saveNovel(novel);}
    if(i%5===0||i===1){novel.stats.words=state.words;s.textContent='Forging '+i+' / '+n+' · Arc '+state.arc+' · anti-repetition check passed · '+Math.round(i/n*100)+'%';await new Promise(r=>setTimeout(r,0));}
   }
   await saveNovel(novel);window.onbeforeunload=null;localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
