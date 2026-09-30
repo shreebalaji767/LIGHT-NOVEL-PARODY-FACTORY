@@ -383,3 +383,5 @@ html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.ma
 
 /* FACTORY 13.0 — library batch studio */
 .library-summary #selectedCount{color:#9a7a42}.book-select{width:17px;height:17px;accent-color:#9a7a42;cursor:pointer;margin-right:8px;vertical-align:middle}.book-index{display:flex;align-items:center;gap:6px}.book-card.selected{background:rgba(164,123,54,.07);box-shadow:inset 3px 0 0 #a47b36}.library-actions .mini:disabled{opacity:.35;cursor:not-allowed}.library-actions .danger-tool{color:#9a4b3d}@media(max-width:760px){.book-index{justify-content:flex-start}.book-select{width:20px;height:20px}.library-summary #selectedCount{width:100%}}
+
+.reader-tools-right button{white-space:nowrap}.library-actions .mini{white-space:nowrap}
