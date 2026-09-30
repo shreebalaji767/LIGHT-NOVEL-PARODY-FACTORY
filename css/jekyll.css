@@ -372,3 +372,6 @@ html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.ma
 
 /* FACTORY 8.0 STORY BIBLE */
 .story-bible-panel .bible-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.story-bible-panel .bible-grid>div{display:grid;gap:7px}.story-bible-panel .bible-area{min-height:100px;resize:vertical}.story-bible-panel .text-input{box-sizing:border-box;width:100%}.story-bible-panel textarea{font:14px 'Libre Baskerville';line-height:1.5;padding:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:inherit;border-radius:8px}@media(max-width:760px){.story-bible-panel .bible-grid{grid-template-columns:1fr}}
+
+/* FACTORY 9.0 SEED CONTROLS */
+.seed-row{display:grid;gap:8px;margin:18px 0}.seed-controls{display:grid;grid-template-columns:1fr auto;gap:8px}.seed-controls .text-input{min-width:0}@media(max-width:560px){.seed-controls{grid-template-columns:1fr}.seed-controls .mini{width:100%}}
