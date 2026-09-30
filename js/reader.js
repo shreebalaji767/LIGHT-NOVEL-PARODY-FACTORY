@@ -1,11 +1,11 @@
-/* LIGHT NOVEL PARODY FACTORY — READER 6.0 */
+/* LIGHT NOVEL PARODY FACTORY — READER 8.0 */
 const id=new URLSearchParams(location.search).get('id');
 let novel,index=0;
 const readerRoot=()=>document.getElementById('reader');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key=(name)=>'lnpf-reader-'+name+'-'+(novel?.id||'unknown');
 const getMarks=()=>JSON.parse(localStorage.getItem(key('bookmarks'))||'[]');
-const getNote=()=>localStorage.getItem(key('note'))||'';
+const getNote=()=>localStorage.getItem(key('note-'+index))||'';
 const saveMarks=v=>localStorage.setItem(key('bookmarks'),JSON.stringify(v));
 getNovel(id).then(n=>{
  if(!n){readerRoot().innerHTML='<div class="reader-error"><h1>Novel not found.</h1><a class="button" href="library.html">RETURN TO LIBRARY</a></div>';return}
@@ -27,13 +27,13 @@ function render(){
  '<div class="reader-tools-right"><button id="chapterMenu">☰ CHAPTERS</button><button id="bookmarkBtn" aria-pressed="'+marked+'">'+(marked?'★ SAVED':'☆ SAVE')+'</button><button id="noteBtn">✎ NOTE</button><button id="themeBtn">◐ THEME</button><button id="fontDown">A−</button><button id="fontUp">A+</button><button id="fullBtn">⛶ FULL</button></div></div>'+
  '<div class="reader-drawer" id="chapterDrawer" hidden><div class="drawer-head"><strong>CHAPTERS</strong><input id="chapterSearch" type="search" placeholder="Search chapter titles…" aria-label="Search chapter titles"></div><div id="chapterList"></div></div>'+
  '<div class="reader-head"><p class="eyebrow">'+esc(novel.title)+'</p><div class="chapter">CHAPTER '+c.number+' / '+novel.chapters+(c.arc?' · ARC '+c.arc:'')+'</div><h1>'+esc(c.title)+'</h1><div class="reader-author">AUTHOR · '+esc(novel.author||'BLLSNVJ21')+'</div><div class="reader-meta">'+(novel.genres||[]).map(esc).join(' · ')+' <span>·</span> '+novel.parody+'% PARODY <span>·</span> '+(c.focus?esc(c.focus):'STORY')+' FOCUS</div></div>'+
- '<div class="reader-note-box" id="noteBox" hidden><label for="readerNote">BOOK NOTE</label><textarea id="readerNote" rows="4" placeholder="Write a private note about this novel…">'+esc(getNote())+'</textarea><div><button id="saveNote" class="mini">SAVE NOTE</button><button id="closeNote" class="mini">CLOSE</button></div></div>'+
+ '<div class="reader-note-box" id="noteBox" hidden><label for="readerNote">CHAPTER NOTE</label><textarea id="readerNote" rows="4" placeholder="Write a private note about this novel…">'+esc(getNote())+'</textarea><div><button id="saveNote" class="mini">SAVE NOTE</button><button id="closeNote" class="mini">CLOSE</button></div></div>'+
  '<div class="novel-text" style="--reader-scale:'+getReaderScale()+'">'+formatText(c.text)+'</div>'+
  '<div class="controls"><button id="prevBtn" '+(index===0?'disabled':'')+'>← PREVIOUS</button><span>CHAPTER '+(index+1)+' / '+total+'</span><button id="nextBtn" '+(index===total-1?'disabled':'')+'>NEXT →</button></div>';
  document.getElementById('chapterMenu').onclick=()=>toggleDrawer();
  document.getElementById('bookmarkBtn').onclick=()=>toggleBookmark();
  document.getElementById('noteBtn').onclick=()=>document.getElementById('noteBox').hidden=!document.getElementById('noteBox').hidden;
- document.getElementById('saveNote').onclick=()=>{localStorage.setItem(key('note'),document.getElementById('readerNote').value);document.getElementById('noteBox').hidden=true};
+ document.getElementById('saveNote').onclick=()=>{localStorage.setItem(key('note-'+index),document.getElementById('readerNote').value);document.getElementById('noteBox').hidden=true};
  document.getElementById('closeNote').onclick=()=>document.getElementById('noteBox').hidden=true;
  document.getElementById('themeBtn').onclick=changeTheme;
  document.getElementById('fontDown').onclick=()=>changeFont(-1);
