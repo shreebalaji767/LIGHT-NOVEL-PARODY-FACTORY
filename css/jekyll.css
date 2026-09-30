@@ -363,3 +363,6 @@ html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.ma
 .brand-link:hover .site-logo{transform:rotate(-4deg) scale(1.05);filter:drop-shadow(0 6px 14px rgba(0,0,0,.38))}
 .brand-link span{display:inline-block}
 @media(max-width:560px){.site-logo{width:36px;height:36px;flex-basis:36px}.brand-link{gap:8px!important}.brand-link span{font-size:13px;line-height:1.05;max-width:190px}}
+
+/* AUTHOR ATTRIBUTION */
+.bp-author,.reader-author{display:inline-flex;align-items:center;gap:10px;letter-spacing:.08em;text-transform:uppercase}.bp-author{margin:10px 0 18px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:rgba(164,123,54,.08)}.bp-author span{font-size:10px;color:var(--muted)}.bp-author strong,.reader-author{color:var(--gold2)}.reader-author{margin:10px 0;font-size:12px;font-weight:700}
