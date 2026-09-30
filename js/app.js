@@ -44,9 +44,32 @@ function makeBlueprint(){
  const locations=shuffle(LOCATION).slice(0,5),hooks=shuffle(CONFLICTS).slice(0,4);
  if(BIBLE.protagonist)chars[0].name=BIBLE.protagonist;return {title,author:AUTHOR,genres,tropes,parody:Number(box('parody').value),chapters:Math.min(MAX_CHAPTERS,Math.max(1,Number(box('chapters').value)||1)),settings:{...SETTINGS},bible:{...BIBLE},seed:SEED,characters:chars,locations,hooks,engineVersion:ENGINE_VERSION,created:Date.now()};
 }
+function factoryFingerprint(bp){
+ const raw=[bp.title,bp.seed,bp.genres.join('|'),bp.tropes.join('|'),bp.parody,bp.chapters,bp.bible?.worldPremise||''].join('::');
+ let h=2166136261;for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}return ('00000000'+(h>>>0).toString(16)).slice(-8).toUpperCase();
+}
+function parodyDNA(bp){
+ const p=Number(bp.parody||0),g=bp.genres.length,t=bp.tropes.length;
+ return {
+  chaos:Math.min(100,Math.round(p*.65+g*5+t*3)),
+  tropeCollision:Math.min(100,Math.round((t*9)+(p*.18))),
+  unpredictability:Math.min(100,Math.round(p*.55+g*4)),
+  sincerity:Math.max(0,Math.round(100-p*.62)),
+  identity:factoryFingerprint(bp)
+ };
+}
+function narrativeLaws(bp){
+ const p=Number(bp.parody||0);
+ const laws=['The protagonist cannot solve the obvious problem first.','Every major discovery must create a smaller, stranger question.','Side characters are allowed to become temporarily more competent than the protagonist.'];
+ if(p>=70)laws.push('At least one serious moment must be interrupted by something magnificently stupid.');
+ if(p>=90)laws.push('Logic may complain, but it does not get veto power.');
+ if(bp.tropes.some(x=>/Prophecy/i.test(x)))laws.push('Prophecies must remain technically interpretable and emotionally inconvenient.');
+ if(bp.tropes.some(x=>/System/i.test(x)))laws.push('System notifications create consequences; they are never decoration.');
+ return laws;
+}
 function renderBlueprint(bp){
  const root=box('blueprintView');
- root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 13.0</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing</p></div><span class="status-pill">READY</span></div><div class="bp-author"><span>AUTHOR</span><strong>BLLSNVJ21</strong></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>STORY BIBLE</h3><p>Custom protagonist, world premise, signature item and forbidden phrases are locked into this blueprint.</p></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
+ root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 14.0</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing · narrative laws</p></div><span class="status-pill">READY</span></div><div class="bp-author"><span>AUTHOR</span><strong>BLLSNVJ21</strong></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>STORY BIBLE</h3><p>Custom protagonist, world premise, signature item and forbidden phrases are locked into this blueprint.</p></div><div class="bp-section"><h3>⚡ PARODY DNA</h3><div class="bp-stats"><div><b>'+parodyDNA(bp).chaos+'%</b><span>CHAOS</span></div><div><b>'+parodyDNA(bp).tropeCollision+'%</b><span>TROPE COLLISION</span></div><div><b>'+parodyDNA(bp).unpredictability+'%</b><span>UNPREDICTABILITY</span></div><div><b>'+parodyDNA(bp).sincerity+'%</b><span>SINCERITY</span></div></div><p class="muted">FACTORY FINGERPRINT · '+parodyDNA(bp).identity+'</p></div><div class="bp-section"><h3>📜 NARRATIVE LAWS</h3><ul>'+narrativeLaws(bp).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
  box('generate').onclick=()=>{addGenerationControls();generate(bp)};box('discard').onclick=()=>{root.innerHTML='';box('status').textContent='Blueprint discarded.'};addGenerationControls();
 }
 box('blueprint').onclick=()=>{box('status').textContent='Building story bible and continuity plan...';const bp=makeBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. The engine will prevent repetitive chapter construction.'};
