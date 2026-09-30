@@ -385,3 +385,9 @@ html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.ma
 .library-summary #selectedCount{color:#9a7a42}.book-select{width:17px;height:17px;accent-color:#9a7a42;cursor:pointer;margin-right:8px;vertical-align:middle}.book-index{display:flex;align-items:center;gap:6px}.book-card.selected{background:rgba(164,123,54,.07);box-shadow:inset 3px 0 0 #a47b36}.library-actions .mini:disabled{opacity:.35;cursor:not-allowed}.library-actions .danger-tool{color:#9a4b3d}@media(max-width:760px){.book-index{justify-content:flex-start}.book-select{width:20px;height:20px}.library-summary #selectedCount{width:100%}}
 
 .reader-tools-right button{white-space:nowrap}.library-actions .mini{white-space:nowrap}
+
+/* READER 14.0 — reading intelligence */
+.reader-stats{max-width:900px;margin:26px auto 10px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.reader-stats span{padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(164,123,54,.06);font-size:9px;letter-spacing:1.4px;color:var(--muted)}.reader-stats b{display:block;margin-top:4px;color:var(--gold2);font-size:15px;letter-spacing:0}.reader-toolbar button{min-height:40px}.reader-tools-right{overflow-x:auto}.reader-tools-right button{flex:0 0 auto}@media(max-width:760px){.reader-stats{grid-template-columns:1fr 1fr}.reader-stats span{font-size:8px}.reader-stats b{font-size:13px}}
+/* LIBRARY 4.0 — management controls */
+#favoriteSelected{color:#9d7b45}.library-actions .mini{min-height:38px}
+@media print{.masthead,.reader-toolbar,.reader-progress,.reader-drawer,.reader-note-box,.controls,.pwa-settings-button,.reader-stats{display:none!important}.reader{padding:0!important;max-width:none!important}.novel-text{max-width:800px!important;margin:auto!important;font-size:18px!important;color:#111!important}.reader-head{page-break-after:always}.novel-text p{orphans:3;widows:3}}
