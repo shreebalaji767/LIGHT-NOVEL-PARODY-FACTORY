@@ -356,3 +356,10 @@ button,a,input,select{touch-action:manipulation}button:focus-visible,a:focus-vis
 html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.masthead{padding-top:max(20px,env(safe-area-inset-top));padding-left:max(6%,env(safe-area-inset-left));padding-right:max(6%,env(safe-area-inset-right))}
 @media(max-width:760px){.masthead{position:sticky;top:0;z-index:1000;background:rgba(23,20,17,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.button,.mini,.controls button{min-height:44px}.select-card{min-height:48px}.reader-toolbar{position:sticky;top:72px;z-index:900;background:rgba(23,20,17,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.workspace-card,.select-card,.masthead .brand-link{transition:none!important}.pwa-toast{animation:none!important}}
+
+/* SITE BRAND LOGO */
+.brand-link{display:inline-flex!important;align-items:center;gap:12px;text-decoration:none!important}
+.site-logo{width:42px;height:42px;display:block;flex:0 0 42px;object-fit:contain;border-radius:10px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.28));transition:transform .2s ease,filter .2s ease}
+.brand-link:hover .site-logo{transform:rotate(-4deg) scale(1.05);filter:drop-shadow(0 6px 14px rgba(0,0,0,.38))}
+.brand-link span{display:inline-block}
+@media(max-width:560px){.site-logo{width:36px;height:36px;flex-basis:36px}.brand-link{gap:8px!important}.brand-link span{font-size:13px;line-height:1.05;max-width:190px}}
