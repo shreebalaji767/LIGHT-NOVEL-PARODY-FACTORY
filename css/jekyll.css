@@ -339,3 +339,12 @@ nav a:hover::after{right:0}
 /* Clickable home logo */
 .brand-link{display:inline-block;color:inherit;text-decoration:none;cursor:pointer}
 .brand-link:hover{color:inherit;text-decoration:none}
+
+
+/* Navigation + home-logo upgrade */
+.masthead .brand-link{position:relative;transition:opacity .2s ease,transform .2s ease}
+.masthead .brand-link:hover{opacity:.86;transform:translateY(-1px)}
+.masthead nav a{position:relative}
+.masthead nav a.active{font-weight:700}
+.masthead nav a.active:after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:2px;background:currentColor;opacity:.8}
+@media(max-width:600px){.masthead nav a.active:after{bottom:-4px}.masthead .brand-link{max-width:72vw}}
