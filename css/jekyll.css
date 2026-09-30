@@ -348,3 +348,11 @@ nav a:hover::after{right:0}
 .masthead nav a.active{font-weight:700}
 .masthead nav a.active:after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:2px;background:currentColor;opacity:.8}
 @media(max-width:600px){.masthead nav a.active:after{bottom:-4px}.masthead .brand-link{max-width:72vw}}
+
+
+/* WEB APP 2026 — accessibility, safe-area and app-shell polish */
+.skip-link{position:fixed;top:10px;left:10px;z-index:20000;transform:translateY(-160%);background:#c9a66a;color:#171411;padding:10px 14px;border-radius:8px;font:700 12px 'Libre Baskerville';text-decoration:none;box-shadow:0 8px 25px #0008}.skip-link:focus{transform:translateY(0)}
+button,a,input,select{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #c9a66a;outline-offset:3px}
+html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.masthead{padding-top:max(20px,env(safe-area-inset-top));padding-left:max(6%,env(safe-area-inset-left));padding-right:max(6%,env(safe-area-inset-right))}
+@media(max-width:760px){.masthead{position:sticky;top:0;z-index:1000;background:rgba(23,20,17,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.button,.mini,.controls button{min-height:44px}.select-card{min-height:48px}.reader-toolbar{position:sticky;top:72px;z-index:900;background:rgba(23,20,17,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.workspace-card,.select-card,.masthead .brand-link{transition:none!important}.pwa-toast{animation:none!important}}
