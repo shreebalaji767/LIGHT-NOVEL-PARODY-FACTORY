@@ -4,7 +4,7 @@
 const GENRES=['Isekai','Fantasy','Action','Adventure','Romance','Comedy','Horror','Mystery','School','Villainess','Cultivation','Sci-Fi','Reincarnation','Game/System','Dungeon','Demon Lord','Slice of Life','Supernatural','Sports','Mecha','Magical Girl','Post-Apocalypse','Cyberpunk','Historical','Military','Cooking','Otome','Time Travel','Survival','Political Intrigue','Music','Western','Pirates','Steampunk','Urban Fantasy','Dark Fantasy'];
 const TROPES=['Overpowered Protagonist','Weak-to-Strong','Accidental Hero','Villainess Reincarnation','Deadpan Genius','Hot-Blooded Rival','Chaotic Best Friend','Mysterious Transfer Student','Ancient Sealed Power','Hidden Royalty','Fake Weakness','System Window Addict','Dense Romantic Lead','Tsundere Rival','Unreasonably Hungry Hero','Mentor Who Knows Too Much','Comic Relief Who Saves Everyone','Secret Final Boss','Prophecy That Makes No Sense','Nobody Reads The Instructions'];
 const NAMES=['Alden','Mira','Rin','Kael','Liora','Yuki','Sora','Vera','Bram','Noel','Iris','Gideon','Talia','Ren','Marek','Nia','Cato','Elara','Jun','Selene'];
-const box=id=>document.getElementById(id);let selectedGenres=['Isekai','Comedy'],selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];
+const box=id=>document.getElementById(id);const safeBox=id=>document.getElementById(id);let selectedGenres=['Isekai','Comedy'],selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];
 const shuffle=a=>[...a].sort(()=>Math.random()-.5),pick=a=>a[Math.floor(Math.random()*a.length)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function updateUI(){const p=Number(box('parody').value),c=Number(box('chapters').value);box('genreCount').textContent=selectedGenres.length+' SELECTED';box('tropeCount').textContent=selectedTropes.length+' SELECTED';box('parodyOut').value=p+'%';box('chapterOut').value=c;box('wordEstimate').textContent=(c*800).toLocaleString()+' words';box('configSummary').textContent=selectedGenres.length+' genres · '+selectedTropes.length+' tropes · '+p+'% parody';localStorage.setItem('lnpf-draft',JSON.stringify({genres:selectedGenres,tropes:selectedTropes,parody:p,chapters:c,title:box('title').value}));}
@@ -16,9 +16,9 @@ box('allTropes').onclick=()=>{selectedTropes=selectedTropes.length===TROPES.leng
 box('randomGenres').onclick=()=>{selectedGenres=shuffle(GENRES).slice(0,Math.floor(Math.random()*4)+2);cards(GENRES,box('genres'),selectedGenres);updateUI()};
 box('randomTropes').onclick=()=>{selectedTropes=shuffle(TROPES).slice(0,Math.floor(Math.random()*5)+3);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
 box('resetFactory').onclick=()=>{localStorage.removeItem('lnpf-draft');selectedGenres=['Isekai','Comedy'];selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];box('parody').value=90;box('chapters').value=200;box('title').value='';box('blueprintView').innerHTML='';box('status').textContent='Configuration reset.';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
-box('parody').oninput=updateUI;box('chapters').oninput=updateUI;box('title').oninput=updateUI;
+box('parody').oninput=updateUI;box('chapters').oninput=updateUI;box('title').oninput=updateUI;['tone','romance','comedy','serious','violence'].forEach(id=>{const e=safeBox(id);if(e)e.oninput=()=>{readSettings();updateUI()}});const surprise=safeBox('surpriseMe');if(surprise)surprise.onclick=randomizeEverything;
 
-const TITLE_A=['The Hero','The Villainess','The Reluctant Genius','The Accidental Overlord','The Nobody','The Transfer Student','The Cook Who','The Knight Who','The Player Who','The Person Who'];
+const SETTINGS={tone:50,romance:30,comedy:70,serious:30,violence:20};\nfunction readSettings(){Object.keys(SETTINGS).forEach(k=>{const e=safeBox(k);if(e)SETTINGS[k]=Number(e.value)})}\nfunction randomizeEverything(){selectedGenres=shuffle(GENRES).slice(0,Math.floor(Math.random()*5)+2);selectedTropes=shuffle(TROPES).slice(0,Math.floor(Math.random()*6)+3);box('parody').value=Math.floor(Math.random()*101);box('chapters').value=(Math.floor(Math.random()*81)+20)*10;box('title').value='';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()}\n\nconst TITLE_A=['The Hero','The Villainess','The Reluctant Genius','The Accidental Overlord','The Nobody','The Transfer Student','The Cook Who','The Knight Who','The Player Who','The Person Who'];
 const TITLE_B=['Refused To Follow The Plot','Broke The Prophecy','Accidentally Started A War','Found A Dungeon Behind The Kitchen','Was Too Busy Eating','Read The System Terms','Inherited The Wrong Kingdom','Turned A Side Quest Into A Crisis'];
 const LOCATION=['the Clockwork Capital','the Rain District','the Infinite Dungeon','the Moonlit Market','the Academy of Unreasonable Rules','the Ashen Coast','the Glass Forest','the Underground Railway','the Palace Basement','the village nobody put on the map','the floating archive','the border where maps become suggestions'];
 const OBJECT=['a cracked silver coin','a suspicious recipe','a sealed letter','a broken compass','a tiny black key','an unsigned contract','a ridiculous crown','a glowing spoon','a map with one missing street','a bell that rings at the wrong time'];
@@ -33,7 +33,7 @@ function makeBlueprint(){
  const title=box('title').value.trim()||makeTitle(), genres=selectedGenres.length?selectedGenres:['Fantasy'], tropes=selectedTropes.length?selectedTropes:['Accidental Hero'];
  const used=new Set(),chars=[];for(const role of ['PROTAGONIST','RIVAL','COMPANION','MENTOR']){let name;do{name=pick(NAMES)}while(used.has(name));used.add(name);chars.push({role,name,trope:pick(tropes)})}
  const locations=shuffle(LOCATION).slice(0,5),hooks=shuffle(CONFLICTS).slice(0,4);
- return {title,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),characters:chars,locations,hooks,engineVersion:'3.0',created:Date.now()};
+ return {title,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),settings:{...SETTINGS},characters:chars,locations,hooks,engineVersion:'4.0',created:Date.now()};
 }
 function renderBlueprint(bp){
  const root=box('blueprintView');
@@ -89,16 +89,16 @@ function makeChapter(i,bp,state){
 function charDetail(state,bp,s,pool,n){const a=pick(pool),b=pick(pool.filter(x=>x!==a));return n%2?s.char.name+' noticed '+a+' near '+s.loc+', while '+s.other.name+' connected it to '+b+'. The connection was incomplete, but incomplete information was still information.': 'The group compared notes. '+a+' mattered because '+s.other.name+' remembered '+b+'. Nobody had enough evidence to declare the theory correct, so they recorded it instead.'}
 function similarity(a,b){const A=new Set(String(a).toLowerCase().split(/\W+/).filter(x=>x.length>4)),B=new Set(String(b).toLowerCase().split(/\W+/).filter(x=>x.length>4));let inter=0;A.forEach(x=>B.has(x)&&inter++);return inter/Math.max(1,Math.min(A.size,B.size))}
 async function generate(bp){
- const s=box('genStatus'),n=bp.chapters,state=createState(bp),novel={id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'3.0',antiRepetition:true,continuity:true,arcs:true},stats:{words:0,regenerations:0}};
- box('generate').disabled=true;box('discard').disabled=true;
+ const s=box('genStatus'),n=bp.chapters,state=createState(bp),novel={id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'4.0',antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true},stats:{words:0,regenerations:0}};
+ box('generate').disabled=true;box('discard').disabled=true;window.onbeforeunload=()=> 'Generation is in progress. Leave this page only if you want to stop it.';
  try{
   for(let i=1;i<=n;i++){
    let chapter,attempt=0;
    do{chapter=makeChapter(i,bp,state);attempt++;}while(novel.generated.slice(-12).some(x=>similarity(x.text,chapter.text)>.72)&&attempt<5);
    if(attempt>1)novel.stats.regenerations+=attempt-1;
    novel.generated.push(chapter);
-   if(i%5===0||i===1){novel.stats.words=state.words;s.textContent='Forging '+i+' / '+n+' · Arc '+state.arc+' · anti-repetition check passed · '+Math.round(i/n*100)+'%';await new Promise(r=>setTimeout(r,0));}
+   if(i%25===0){novel.stats.words=state.words;await saveNovel(novel);}\n   if(i%5===0||i===1){novel.stats.words=state.words;s.textContent='Forging '+i+' / '+n+' · Arc '+state.arc+' · anti-repetition check passed · '+Math.round(i/n*100)+'%';await new Promise(r=>setTimeout(r,0));}
   }
-  await saveNovel(novel);localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
- }catch(e){console.error(e);s.textContent='Generation stopped safely: '+(e.message||'storage error');box('generate').disabled=false;box('discard').disabled=false}
+  await saveNovel(novel);window.onbeforeunload=null;localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
+ }catch(e){console.error(e);try{await saveNovel(novel)}catch{}s.textContent='Generation stopped safely: '+(e.message||'storage error');box('generate').disabled=false;box('discard').disabled=false}
 }
