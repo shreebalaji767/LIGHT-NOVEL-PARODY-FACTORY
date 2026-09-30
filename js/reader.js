@@ -1,4 +1,4 @@
-/* LIGHT NOVEL PARODY FACTORY — READER 9.0 */
+/* LIGHT NOVEL PARODY FACTORY — READER 11.0 */
 const id=new URLSearchParams(location.search).get('id');
 let novel,index=0;
 const readerRoot=()=>document.getElementById('reader');
@@ -9,7 +9,7 @@ const getNote=()=>localStorage.getItem(key('note-'+index))||'';
 const saveMarks=v=>localStorage.setItem(key('bookmarks'),JSON.stringify(v));
 getNovel(id).then(n=>{
  if(!n){readerRoot().innerHTML='<div class="reader-error"><h1>Novel not found.</h1><a class="button" href="library.html">RETURN TO LIBRARY</a></div>';return}
- novel=n; index=Math.min(Math.max(0,n.position||0),(n.generated?.length||1)-1); render();
+ novel=n; if(n.formatVersion&&Number(n.formatVersion)<10) console.warn('Legacy novel format:',n.formatVersion); index=Math.min(Math.max(0,n.position||0),(n.generated?.length||1)-1); render();
 }).catch(e=>readerRoot().innerHTML='<div class="reader-error"><h1>Reader storage error.</h1><p>'+esc(e.message)+'</p></div>');
 
 function render(){
@@ -20,10 +20,11 @@ function render(){
  document.body.dataset.readerTheme=theme;
  document.title=novel.title+' · Chapter '+c.number;
  const chapterWords=String(c.text||'').trim().split(/\s+/).filter(Boolean).length;
+ const exact800=chapterWords===800;
  const minutes=Math.max(1,Math.ceil(chapterWords/220));
  readerRoot().innerHTML=
  '<div class="reader-progress"><span style="width:'+progress+'%"></span></div>'+
- '<div class="reader-toolbar"><div class="reader-tools-left"><span class="reader-progress-label">'+progress+'% READ · ARC '+(c.arc||'?')+' · '+minutes+' MIN</span></div>'+
+ '<div class="reader-toolbar"><div class="reader-tools-left"><span class="reader-progress-label">'+progress+'% READ · ARC '+(c.arc||'?')+' · '+minutes+' MIN'+(exact800?' · 800-WORD':'')+'</span></div>'+
  '<div class="reader-tools-right"><button id="chapterMenu">☰ CHAPTERS</button><button id="bookmarkBtn" aria-pressed="'+marked+'">'+(marked?'★ SAVED':'☆ SAVE')+'</button><button id="noteBtn">✎ NOTE</button><button id="themeBtn">◐ THEME</button><button id="fontDown">A−</button><button id="fontUp">A+</button><button id="fullBtn">⛶ FULL</button></div></div>'+
  '<div class="reader-drawer" id="chapterDrawer" hidden><div class="drawer-head"><strong>CHAPTERS</strong><input id="chapterSearch" type="search" placeholder="Search chapter titles…" aria-label="Search chapter titles"></div><div id="chapterList"></div></div>'+
  '<div class="reader-head"><p class="eyebrow">'+esc(novel.title)+'</p><div class="chapter">CHAPTER '+c.number+' / '+novel.chapters+(c.arc?' · ARC '+c.arc:'')+'</div><h1>'+esc(c.title)+'</h1><div class="reader-author">AUTHOR · '+esc(novel.author||'BLLSNVJ21')+'</div><div class="reader-meta">'+(novel.genres||[]).map(esc).join(' · ')+' <span>·</span> '+novel.parody+'% PARODY <span>·</span> '+(c.focus?esc(c.focus):'STORY')+' FOCUS</div></div>'+
