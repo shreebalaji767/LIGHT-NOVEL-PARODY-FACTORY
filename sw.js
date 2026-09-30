@@ -1,14 +1,14 @@
-const CACHE='lnpf-v17';
+const CACHE='lnpf-v18';
 const APP_SHELL=['./','./index.html','./create.html','./library.html','./reader.html','./css/jekyll.css','./js/storage.js','./js/app.js','./js/library.js','./js/reader.js','./js/pwa.js','./manifest.webmanifest','./icons/icon-192.svg','./icons/icon-512.svg','./offline.html'];
 const OFFLINE='./offline.html';
-const VERSION='13.0';
+const VERSION='14.0';
 
 self.addEventListener('install',event=>event.waitUntil(
   caches.open(CACHE).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting())
 ));
 
 self.addEventListener('activate',event=>event.waitUntil(
-  caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key))))
+  caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('lnpf-')&&key!==CACHE).map(key=>caches.delete(key))))
     .then(()=>self.clients.claim())
 ));
 
