@@ -1,4 +1,4 @@
-/* LIGHT NOVEL PARODY FACTORY — STORY ENGINE 10.0
+/* LIGHT NOVEL PARODY FACTORY — STORY ENGINE 11.0
    Procedural long-form engine with continuity, anti-repetition, pacing and safe persistence.
 */
 const AUTHOR='BLLSNVJ21';const GENRES=['Isekai','Fantasy','Action','Adventure','Romance','Comedy','Horror','Mystery','School','Villainess','Cultivation','Sci-Fi','Reincarnation','Game/System','Dungeon','Demon Lord','Slice of Life','Supernatural','Sports','Mecha','Magical Girl','Post-Apocalypse','Cyberpunk','Historical','Military','Cooking','Otome','Time Travel','Survival','Political Intrigue','Music','Western','Pirates','Steampunk','Urban Fantasy','Dark Fantasy'];
@@ -36,11 +36,11 @@ function makeBlueprint(){
  const title=box('title').value.trim()||makeTitle(), genres=selectedGenres.length?selectedGenres:['Fantasy'], tropes=selectedTropes.length?selectedTropes:['Accidental Hero'];readSettings();Object.keys(BIBLE).forEach(k=>{if(safeBox(k))BIBLE[k]=safeBox(k).value.trim()});
  const used=new Set(),chars=[];for(const role of ['PROTAGONIST','RIVAL','COMPANION','MENTOR']){let name;do{name=pick(NAMES)}while(used.has(name));used.add(name);chars.push({role,name,trope:pick(tropes)})}
  const locations=shuffle(LOCATION).slice(0,5),hooks=shuffle(CONFLICTS).slice(0,4);
- if(BIBLE.protagonist)chars[0].name=BIBLE.protagonist;return {title,author:AUTHOR,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),settings:{...SETTINGS},bible:{...BIBLE},seed:SEED,characters:chars,locations,hooks,engineVersion:'10.0',created:Date.now()};
+ if(BIBLE.protagonist)chars[0].name=BIBLE.protagonist;return {title,author:AUTHOR,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),settings:{...SETTINGS},bible:{...BIBLE},seed:SEED,characters:chars,locations,hooks,engineVersion:'11.0',created:Date.now()};
 }
 function renderBlueprint(bp){
  const root=box('blueprintView');
- root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 10.0</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing</p></div><span class="status-pill">READY</span></div><div class="bp-author"><span>AUTHOR</span><strong>BLLSNVJ21</strong></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>STORY BIBLE</h3><p>Custom protagonist, world premise, signature item and forbidden phrases are locked into this blueprint.</p></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
+ root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 11.0</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing</p></div><span class="status-pill">READY</span></div><div class="bp-author"><span>AUTHOR</span><strong>BLLSNVJ21</strong></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>STORY BIBLE</h3><p>Custom protagonist, world premise, signature item and forbidden phrases are locked into this blueprint.</p></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
  box('generate').onclick=()=>{addGenerationControls();generate(bp)};box('discard').onclick=()=>{root.innerHTML='';box('status').textContent='Blueprint discarded.'};addGenerationControls();
 }
 box('blueprint').onclick=()=>{box('status').textContent='Building story bible and continuity plan...';const bp=makeBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. The engine will prevent repetitive chapter construction.'};
@@ -94,13 +94,25 @@ function similarity(a,b){const A=new Set(String(a).toLowerCase().split(/\W+/).fi
 let generationCancelled=false;let activeGeneration=null;
 function addGenerationControls(){const zone=document.querySelector('.generate-zone');if(!zone||document.getElementById('cancelGeneration'))return;const b=document.createElement('button');b.id='cancelGeneration';b.className='text-button';b.textContent='STOP GENERATION';b.onclick=()=>{generationCancelled=true};zone.appendChild(b)}
 async function generate(bp,resumeNovel=null,resumeState=null){
- generationCancelled=false;if(resumeNovel?.checkpoint?.rngState!=null){SEED=resumeNovel.checkpoint.seed||bp.seed||SEED;RNG_STATE=resumeNovel.checkpoint.rngState;RNG=()=>{RNG_STATE+=0x6D2B79F5;let x=RNG_STATE;x=Math.imul(x^(x>>>15),x|1);x^=x+Math.imul(x^(x>>>7),x|61);return((x^(x>>>14))>>>0)/4294967296}}else if(bp.seed)setSeed(bp.seed);const s=box('genStatus'),n=bp.chapters,state=resumeState||createState(bp),novel=resumeNovel||{id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'10.0',antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true,resumable:true},stats:{words:0,regenerations:0,exact800:0}};const start=novel.generated.length+1;activeGeneration={novel,state};
+ generationCancelled=false;if(resumeNovel?.checkpoint?.rngState!=null){SEED=resumeNovel.checkpoint.seed||bp.seed||SEED;RNG_STATE=resumeNovel.checkpoint.rngState;RNG=()=>{RNG_STATE+=0x6D2B79F5;let x=RNG_STATE;x=Math.imul(x^(x>>>15),x|1);x^=x+Math.imul(x^(x>>>7),x|61);return((x^(x>>>14))>>>0)/4294967296}}else if(bp.seed)setSeed(bp.seed);const s=box('genStatus'),n=bp.chapters,state=resumeState||createState(bp),novel=resumeNovel||{id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'11.0',antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true,resumable:true},stats:{words:0,regenerations:0,exact800:0}};const start=novel.generated.length+1;activeGeneration={novel,state};
  box('generate').disabled=true;box('discard').disabled=true;window.onbeforeunload=()=> 'Generation is in progress. Leave this page only if you want to stop it.';
  try{
   for(let i=start;i<=n;i++){
    if(generationCancelled)throw new Error('Generation cancelled by user.');
-   let chapter,attempt=0;
-   do{chapter=makeChapter(i,bp,state);attempt++;}while(novel.generated.slice(-12).some(x=>similarity(x.text,chapter.text)>.72)&&attempt<5);
+   let chapter,attempt=0,accepted=false;
+   const baseState=JSON.stringify({...state,usedTitles:[...state.usedTitles],usedEvents:[...state.usedEvents]});
+   const baseRng=RNG_STATE;
+   do{
+    if(attempt>0){
+      const restored=JSON.parse(baseState);
+      Object.assign(state,restored);
+      state.usedTitles=new Set(restored.usedTitles||[]);
+      state.usedEvents=new Set(restored.usedEvents||[]);
+      RNG_STATE=baseRng;
+    }
+    chapter=makeChapter(i,bp,state);attempt++;
+    accepted=!novel.generated.slice(-12).some(x=>similarity(x.text,chapter.text)>.72);
+   }while(!accepted&&attempt<5);
    if(attempt>1)novel.stats.regenerations+=attempt-1;
    if(chapter.text.split(/\s+/).filter(Boolean).length!==800)throw new Error('Chapter word-count integrity check failed.');novel.stats.exact800++;novel.generated.push(chapter);
    if(i%10===0){novel.stats.words=state.words;novel.checkpoint={chapter:i,state:JSON.parse(JSON.stringify(state)),rngState:RNG_STATE,seed:SEED};await saveNovel(novel);}
