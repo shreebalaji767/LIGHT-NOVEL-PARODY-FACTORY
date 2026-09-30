@@ -334,3 +334,8 @@ nav a:hover::after{right:0}
 
 /* PWA 4.0 */
 .pwa-panel{z-index:10000}.pwa-panel-card{max-height:min(90vh,720px);overflow:auto}.pwa-panel-actions{grid-template-columns:1fr 1fr}.pwa-panel-actions .mini{min-height:42px}.pwa-settings-button{touch-action:manipulation}@media(max-width:600px){.pwa-panel{padding:10px}.pwa-panel-card{border-radius:16px;padding:16px}.pwa-panel-actions{grid-template-columns:1fr}.pwa-status-row{font-size:12px}}
+
+
+/* Clickable home logo */
+.brand-link{display:inline-block;color:inherit;text-decoration:none;cursor:pointer}
+.brand-link:hover{color:inherit;text-decoration:none}
