@@ -147,7 +147,7 @@ async function generate(bp,resumeNovel=null,resumeState=null){
    if(attempt>1)novel.stats.regenerations+=attempt-1;
    if(chapter.text.split(/\s+/).filter(Boolean).length!==WORD_TARGET)throw new Error('Chapter word-count integrity check failed.');novel.stats.exact800++;novel.stats.lastGeneratedAt=Date.now();novel.stats.lastChapterWords=WORD_TARGET;novel.stats.totalGenerationMs=(novel.stats.totalGenerationMs||0)+(Date.now()-chapterStarted);novel.generated.push(chapter);
    if(i%GENERATOR_YIELD===0){const pct=Math.round(i/n*100);const elapsed=Math.max(1,Date.now()-Number(novel.stats.generationStartedAt||Date.now()));const perChapter=elapsed/i;const eta=Math.max(0,Math.round((n-i)*perChapter/1000));s.textContent='FORGING '+i+' / '+n+' · '+pct+'% · ARC '+state.arc+' · ETA '+(eta<60?eta+'s':Math.ceil(eta/60)+'m')+' · CHECKPOINT READY';await new Promise(r=>setTimeout(r,0));}
-   novel.stats.words=state.words;novel.checkpoint={chapter:i,state:JSON.parse(JSON.stringify(state)),rngState:RNG_STATE,seed:SEED};await saveNovel(novel);
+   novel.stats.words=state.words;novel.checkpoint={chapter:i,state:JSON.parse(JSON.stringify(state)),rngState:RNG_STATE,seed:SEED};await saveChapter(novel.id,i-1,chapter);await updateNovelMeta(novel.id,{stats:novel.stats,checkpoint:novel.checkpoint,position:Math.max(0,i-1)});
    if(i%5===0||i===1){novel.stats.words=state.words;s.textContent='Forging '+i+' / '+n+' · Arc '+state.arc+' · anti-repetition check passed · '+Math.round(i/n*100)+'%';await new Promise(r=>setTimeout(r,0));}
   }
   await saveNovel(novel);delete novel.checkpoint;await saveNovel(novel);window.onbeforeunload=null;activeGeneration=null;localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
