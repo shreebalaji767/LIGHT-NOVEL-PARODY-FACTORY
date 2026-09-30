@@ -4,7 +4,7 @@
 const GENRES=['Isekai','Fantasy','Action','Adventure','Romance','Comedy','Horror','Mystery','School','Villainess','Cultivation','Sci-Fi','Reincarnation','Game/System','Dungeon','Demon Lord','Slice of Life','Supernatural','Sports','Mecha','Magical Girl','Post-Apocalypse','Cyberpunk','Historical','Military','Cooking','Otome','Time Travel','Survival','Political Intrigue','Music','Western','Pirates','Steampunk','Urban Fantasy','Dark Fantasy'];
 const TROPES=['Overpowered Protagonist','Weak-to-Strong','Accidental Hero','Villainess Reincarnation','Deadpan Genius','Hot-Blooded Rival','Chaotic Best Friend','Mysterious Transfer Student','Ancient Sealed Power','Hidden Royalty','Fake Weakness','System Window Addict','Dense Romantic Lead','Tsundere Rival','Unreasonably Hungry Hero','Mentor Who Knows Too Much','Comic Relief Who Saves Everyone','Secret Final Boss','Prophecy That Makes No Sense','Nobody Reads The Instructions'];
 const NAMES=['Alden','Mira','Rin','Kael','Liora','Yuki','Sora','Vera','Bram','Noel','Iris','Gideon','Talia','Ren','Marek','Nia','Cato','Elara','Jun','Selene'];
-const box=id=>document.getElementById(id);const safeBox=id=>document.getElementById(id);let selectedGenres=['Isekai','Comedy'],selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];
+const box=id=>document.getElementById(id);const safeBox=id=>document.getElementById(id);const SETTINGS={tone:50,romance:30,comedy:70,serious:30,violence:20};let selectedGenres=['Isekai','Comedy'],selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];
 const shuffle=a=>[...a].sort(()=>Math.random()-.5),pick=a=>a[Math.floor(Math.random()*a.length)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function updateUI(){const p=Number(box('parody').value),c=Number(box('chapters').value);box('genreCount').textContent=selectedGenres.length+' SELECTED';box('tropeCount').textContent=selectedTropes.length+' SELECTED';box('parodyOut').value=p+'%';box('chapterOut').value=c;box('wordEstimate').textContent=(c*800).toLocaleString()+' words';box('configSummary').textContent=selectedGenres.length+' genres · '+selectedTropes.length+' tropes · '+p+'% parody';readSettings();localStorage.setItem('lnpf-draft',JSON.stringify({genres:selectedGenres,tropes:selectedTropes,parody:p,chapters:c,title:box('title').value,settings:{...SETTINGS}}));}
@@ -18,7 +18,6 @@ box('randomTropes').onclick=()=>{selectedTropes=shuffle(TROPES).slice(0,Math.flo
 box('resetFactory').onclick=()=>{localStorage.removeItem('lnpf-draft');selectedGenres=['Isekai','Comedy'];selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];box('parody').value=90;box('chapters').value=200;box('title').value='';box('blueprintView').innerHTML='';box('status').textContent='Configuration reset.';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
 box('parody').oninput=updateUI;box('chapters').oninput=updateUI;box('title').oninput=updateUI;['tone','romance','comedy','serious','violence'].forEach(id=>{const e=safeBox(id);if(e)e.oninput=()=>{readSettings();updateUI()}});const surprise=safeBox('surpriseMe');if(surprise)surprise.onclick=randomizeEverything;
 
-const SETTINGS={tone:50,romance:30,comedy:70,serious:30,violence:20};
 function readSettings(){Object.keys(SETTINGS).forEach(k=>{const e=safeBox(k);if(e)SETTINGS[k]=Number(e.value)})}
 function randomizeEverything(){selectedGenres=shuffle(GENRES).slice(0,Math.floor(Math.random()*5)+2);selectedTropes=shuffle(TROPES).slice(0,Math.floor(Math.random()*6)+3);box('parody').value=Math.floor(Math.random()*101);box('chapters').value=(Math.floor(Math.random()*81)+20)*10;box('title').value='';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()}
 
@@ -82,9 +81,7 @@ function makeChapter(i,bp,state){
    'By the end of the chapter, the immediate situation had changed. '+s.thread+' remained unresolved, but the characters now possessed a new piece of information: '+pick(OBJECT)+'. That object would not magically explain itself. Nothing in this world was that considerate.',
  ];
  const detailPool=shuffle([...OBJECT,...LOCATION,...CONFLICTS,...RESOLUTIONS]);while(paragraphs.join(' ').split(/\s+/).length<760)paragraphs.push(charDetail(state,bp,s,detailPool,paragraphs.length));
- let text=paragraphs.join('
-
-');const words=text.split(/\s+/);if(words.length>900)text=words.slice(0,900).join(' ')+'.';
+ let text=paragraphs.join('\\n\\n');const words=text.split(/\s+/);if(words.length>900)text=words.slice(0,900).join(' ')+'.';
  state.words+=text.split(/\s+/).length;
  state.unresolved=state.unresolved.filter(x=>x!==s.thread);if(Math.random()<.7)state.unresolved.push(uniqueFrom(bp.hooks,state.unresolved));
  state.resolved.push(s.thread);if(state.resolved.length>20)state.resolved.shift();
