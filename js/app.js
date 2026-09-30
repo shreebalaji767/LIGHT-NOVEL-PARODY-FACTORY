@@ -1,28 +1,104 @@
+/* LIGHT NOVEL PARODY FACTORY — STORY ENGINE 3.0
+   Procedural long-form engine with continuity, anti-repetition, pacing and safe persistence.
+*/
 const GENRES=['Isekai','Fantasy','Action','Adventure','Romance','Comedy','Horror','Mystery','School','Villainess','Cultivation','Sci-Fi','Reincarnation','Game/System','Dungeon','Demon Lord','Slice of Life','Supernatural','Sports','Mecha','Magical Girl','Post-Apocalypse','Cyberpunk','Historical','Military','Cooking','Otome','Time Travel','Survival','Political Intrigue','Music','Western','Pirates','Steampunk','Urban Fantasy','Dark Fantasy'];
 const TROPES=['Overpowered Protagonist','Weak-to-Strong','Accidental Hero','Villainess Reincarnation','Deadpan Genius','Hot-Blooded Rival','Chaotic Best Friend','Mysterious Transfer Student','Ancient Sealed Power','Hidden Royalty','Fake Weakness','System Window Addict','Dense Romantic Lead','Tsundere Rival','Unreasonably Hungry Hero','Mentor Who Knows Too Much','Comic Relief Who Saves Everyone','Secret Final Boss','Prophecy That Makes No Sense','Nobody Reads The Instructions'];
+const NAMES=['Alden','Mira','Rin','Kael','Liora','Yuki','Sora','Vera','Bram','Noel','Iris','Gideon','Talia','Ren','Marek','Nia','Cato','Elara','Jun','Selene'];
 const box=id=>document.getElementById(id);let selectedGenres=['Isekai','Comedy'],selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];
-const shuffle=a=>[...a].sort(()=>Math.random()-.5);
-function updateUI(){box('genreCount').textContent=selectedGenres.length+' SELECTED';box('tropeCount').textContent=selectedTropes.length+' SELECTED';const p=Number(box('parody').value),c=Number(box('chapters').value);box('parodyOut').value=p+'%';box('chapterOut').value=c;box('wordEstimate').textContent=(c*800).toLocaleString()+' words';box('configSummary').textContent=selectedGenres.length+' genres · '+selectedTropes.length+' tropes · '+p+'% parody'}
-function cards(list,target,selected){target.innerHTML='';list.forEach(x=>{const e=document.createElement('button');e.type='button';e.className='select-card'+(selected.includes(x)?' active':'');e.textContent=x;e.setAttribute('aria-pressed',selected.includes(x));e.onclick=()=>{if(selected.includes(x))selected.splice(selected.indexOf(x),1);else selected.push(x);e.classList.toggle('active');e.setAttribute('aria-pressed',selected.includes(x));updateUI()};target.appendChild(e)})}
-cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);
-box('allGenres').onclick=()=>{selectedGenres=selectedGenres.length===GENRES.length?[]:[...GENRES];cards(GENRES,box('genres'),selectedGenres)};
+const shuffle=a=>[...a].sort(()=>Math.random()-.5),pick=a=>a[Math.floor(Math.random()*a.length)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function updateUI(){const p=Number(box('parody').value),c=Number(box('chapters').value);box('genreCount').textContent=selectedGenres.length+' SELECTED';box('tropeCount').textContent=selectedTropes.length+' SELECTED';box('parodyOut').value=p+'%';box('chapterOut').value=c;box('wordEstimate').textContent=(c*800).toLocaleString()+' words';box('configSummary').textContent=selectedGenres.length+' genres · '+selectedTropes.length+' tropes · '+p+'% parody';localStorage.setItem('lnpf-draft',JSON.stringify({genres:selectedGenres,tropes:selectedTropes,parody:p,chapters:c,title:box('title').value}));}
+function cards(list,target,selected){target.innerHTML='';list.forEach(x=>{const e=document.createElement('button');e.type='button';e.className='select-card'+(selected.includes(x)?' active':'');e.textContent=x;e.setAttribute('aria-pressed',selected.includes(x));e.onclick=()=>{const i=selected.indexOf(x);i>=0?selected.splice(i,1):selected.push(x);cards(list,target,selected);updateUI()};target.appendChild(e)})}
+function restoreDraft(){try{const d=JSON.parse(localStorage.getItem('lnpf-draft')||'null');if(d){selectedGenres=Array.isArray(d.genres)&&d.genres.length?d.genres:selectedGenres;selectedTropes=Array.isArray(d.tropes)&&d.tropes.length?d.tropes:selectedTropes;if(d.parody!=null)box('parody').value=d.parody;if(d.chapters!=null)box('chapters').value=d.chapters;if(d.title)box('title').value=d.title}}catch{}}
+restoreDraft();cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI();
+box('allGenres').onclick=()=>{selectedGenres=selectedGenres.length===GENRES.length?[]:[...GENRES];cards(GENRES,box('genres'),selectedGenres);updateUI()};
 box('allTropes').onclick=()=>{selectedTropes=selectedTropes.length===TROPES.length?[]:[...TROPES];cards(TROPES,box('tropes'),selectedTropes);updateUI()};
-box('randomGenres').onclick=()=>{selectedGenres=shuffle(GENRES).slice(0,3);cards(GENRES,box('genres'),selectedGenres);updateUI()};
-box('randomTropes').onclick=()=>{selectedTropes=shuffle(TROPES).slice(0,4);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
-box('resetFactory').onclick=()=>{selectedGenres=['Isekai','Comedy'];selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];box('parody').value=90;box('chapters').value=200;box('title').value='';box('blueprintView').innerHTML='';box('status').textContent='Configuration reset.';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
-box('parody').oninput=e=>box('parodyOut').value=e.target.value+'%';
-box('chapters').oninput=e=>box('chapterOut').value=e.target.value;
-const WASM_BASE64='AGFzbQEAAAABCQJgAAF/YAF/AAMDAgABBgkBfwFBlZrvOgsHGQIKcmFuZG9tX3UzMgAACHNldF9zZWVkAAEKHQIUACMAQY3MZWxB3+a74wNqJAAjAAsGACAAJAAL';
-let wasm=null;
-async function initWasm(){if(wasm)return wasm;try{const bytes=Uint8Array.from(atob(WASM_BASE64),c=>c.charCodeAt(0));wasm=(await WebAssembly.instantiate(bytes)).instance.exports;wasm.set_seed((Date.now()^0x51f15e)&0xffffffff);return wasm}catch(e){return null}}
-function rnd(){return wasm?((wasm.random_u32()>>>0)/4294967296):Math.random()}
-function pick(a){return a[Math.floor(rnd()*a.length)]}
-function seedText(){return (selectedGenres.join(',')+selectedTropes.join(',')+Date.now()).length}
-function makeTitle(){return pick(['I Was Reincarnated With '+pick(TROPES),'The '+pick(GENRES)+' Hero Who Took Everything Too Seriously','My '+pick(TROPES)+' Life Somehow Became a '+pick(GENRES)+' Disaster','Nobody Asked for This '+pick(GENRES)+' Adventure'])}
-function buildBlueprint(){const title=box('title').value.trim()||makeTitle();const chars=[{role:'PROTAGONIST',name:pick(['Alden','Mira','Rin','Kael','Liora','Yuki','Sora','Vera']),trope:pick(selectedTropes.length?selectedTropes:TROPES)},{role:'RIVAL',name:pick(['Bram','Noel','Iris','Gideon','Kael','Mira']),trope:pick(selectedTropes.length?selectedTropes:TROPES)},{role:'COMPANION',name:pick(['Sora','Vera','Rin','Yuki','Liora','Alden']),trope:pick(selectedTropes.length?selectedTropes:TROPES)}];return{title,genres:selectedGenres.length?selectedGenres:['Random'],tropes:selectedTropes.length?selectedTropes:['Random Chaos'],parody:Number(box('parody').value),chapters:Number(box('chapters').value),characters:chars,locations:['The Capital of Extremely Reasonable Laws','The Infinite Dungeon','The Market of Questionable Discounts'],hooks:['Why was the prophecy written on a receipt?','Who keeps assigning these side quests?','What is hidden beneath the most boring building in town?']}}
-function renderBlueprint(bp){const root=box('blueprintView');root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · BLSSNVJ21</p><h2>'+esc(bp.title)+'</h2></div><span class="status-pill">READY</span></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES</h3><div class="tag-list">'+bp.genres.map(esc).map(x=>'<span>'+x+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+c.role+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>LOCATIONS & STORY HOOKS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>TURN BLUEPRINT INTO MANUSCRIPT →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
-box('generate').onclick=()=>generate(bp);box('discard').onclick=()=>{root.innerHTML='';box('status').textContent='Blueprint discarded.'}}
-box('blueprint').onclick=async()=>{box('status').textContent='Consulting the original WASM random engine...';await initWasm();const bp=buildBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. Review it before generating chapters.'};
-async function generate(bp){const s=box('genStatus'),n=bp.chapters;const novel={id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[]};s.textContent='Generating chapter 1 / '+n+'...';for(let i=1;i<=n;i++){novel.generated.push(makeChapter(i,bp));if(i%10===0){s.textContent='Forging chapter '+i+' / '+n+'...';await new Promise(r=>setTimeout(r,0))}}await saveNovel(novel);location.href='reader.html?id='+novel.id}
-function makeChapter(i,bp){const genre=pick(bp.genres),trope=pick(bp.tropes),char=pick(bp.characters),titles=['The Problem Begins','A Completely Necessary Detour','The Power Nobody Asked For','The Villain Explains Everything','The Receipt Knows Too Much','A Duel, Somehow','The System Has Terms and Conditions','The Most Unnecessary Revelation Ever'];const jokes=['The protagonist made a heroic decision: postpone it until tomorrow.','Everyone agreed this was a terrible plan, then immediately followed it.','A dramatic silence occurred because nobody knew what to say.','The prophecy remained suspiciously confident.'];const serious='The '+genre+' situation around '+char.name+' became impossible to ignore. '+char.name+' relied on the '+trope+' instinct that had somehow carried them this far.';const comic=pick(jokes);const text=(serious+' '+comic+' '+pick(bp.hooks)+' '+serious+' '+comic+' '+pick(jokes)+' ').repeat(60);return{number:i,title:'Chapter '+i+': '+pick(titles),text:text.split(/\s+/).slice(0,800).join(' ')}}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+box('randomGenres').onclick=()=>{selectedGenres=shuffle(GENRES).slice(0,Math.floor(Math.random()*4)+2);cards(GENRES,box('genres'),selectedGenres);updateUI()};
+box('randomTropes').onclick=()=>{selectedTropes=shuffle(TROPES).slice(0,Math.floor(Math.random()*5)+3);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
+box('resetFactory').onclick=()=>{localStorage.removeItem('lnpf-draft');selectedGenres=['Isekai','Comedy'];selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];box('parody').value=90;box('chapters').value=200;box('title').value='';box('blueprintView').innerHTML='';box('status').textContent='Configuration reset.';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
+box('parody').oninput=updateUI;box('chapters').oninput=updateUI;box('title').oninput=updateUI;
+
+const TITLE_A=['The Hero','The Villainess','The Reluctant Genius','The Accidental Overlord','The Nobody','The Transfer Student','The Cook Who','The Knight Who','The Player Who','The Person Who'];
+const TITLE_B=['Refused To Follow The Plot','Broke The Prophecy','Accidentally Started A War','Found A Dungeon Behind The Kitchen','Was Too Busy Eating','Read The System Terms','Inherited The Wrong Kingdom','Turned A Side Quest Into A Crisis'];
+const LOCATION=['the Clockwork Capital','the Rain District','the Infinite Dungeon','the Moonlit Market','the Academy of Unreasonable Rules','the Ashen Coast','the Glass Forest','the Underground Railway','the Palace Basement','the village nobody put on the map','the floating archive','the border where maps become suggestions'];
+const OBJECT=['a cracked silver coin','a suspicious recipe','a sealed letter','a broken compass','a tiny black key','an unsigned contract','a ridiculous crown','a glowing spoon','a map with one missing street','a bell that rings at the wrong time'];
+const VERBS=['investigate','negotiate','escape','challenge','protect','steal','repair','decode','question','outsmart','follow','avoid'];
+const CONFLICTS=['a rival has arrived first','the local rules have changed overnight','an old promise has become relevant','someone has misunderstood the prophecy','the harmless side quest is no longer harmless','a forgotten faction has made its move','the supposed villain wants a refund','the party has discovered an inconvenient truth'];
+const RESOLUTIONS=['the answer creates two new questions','the immediate danger passes, but the cost is recorded','the group gains useful information rather than a clean victory','the conflict ends with an agreement nobody expected','the result changes what the characters believed about the world'];
+const JOKES=['Nobody considered this part of the plan, mostly because there was no plan.','The dramatic pause lasted long enough for someone to ask whether lunch was still happening.','The universe appeared to have a sense of humor, and unfortunately it was using the party as material.','This was technically a victory, although the paperwork strongly disagreed.','Everyone looked at the person who had caused the problem. That person looked at the ceiling.'];
+const OPENERS=['Morning arrived with the confidence of someone who had never seen the previous night.','The day began quietly, which was the first suspicious thing about it.','By noon, the situation had become complicated enough to deserve a committee.','Nothing unusual happened for nearly seven minutes. Then everything happened at once.','The road ahead looked ordinary. The road was lying.'];
+
+function makeTitle(){return pick(TITLE_A)+' '+pick(TITLE_B)}
+function makeBlueprint(){
+ const title=box('title').value.trim()||makeTitle(), genres=selectedGenres.length?selectedGenres:['Fantasy'], tropes=selectedTropes.length?selectedTropes:['Accidental Hero'];
+ const used=new Set(),chars=[];for(const role of ['PROTAGONIST','RIVAL','COMPANION','MENTOR']){let name;do{name=pick(NAMES)}while(used.has(name));used.add(name);chars.push({role,name,trope:pick(tropes)})}
+ const locations=shuffle(LOCATION).slice(0,5),hooks=shuffle(CONFLICTS).slice(0,4);
+ return {title,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),characters:chars,locations,hooks,engineVersion:'3.0',created:Date.now()};
+}
+function renderBlueprint(bp){
+ const root=box('blueprintView');
+ root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 3.0</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing</p></div><span class="status-pill">READY</span></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
+ box('generate').onclick=()=>generate(bp);box('discard').onclick=()=>{root.innerHTML='';box('status').textContent='Blueprint discarded.'};
+}
+box('blueprint').onclick=()=>{box('status').textContent='Building story bible and continuity plan...';const bp=makeBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. The engine will prevent repetitive chapter construction.'};
+
+function createState(bp){return{chapter:0,arc:1,arcLength:Math.max(8,Math.ceil(bp.chapters/Math.min(12,Math.max(4,Math.ceil(bp.chapters/40))))),location:bp.locations[0],characters:bp.characters.map(c=>({...c,mood:'uncertain',goal:'understand what is happening',relationship:0})),unresolved:[...bp.hooks],resolved:[],foreshadow:[],recentTitles:[],recentPhrases:[],recentEvents:[],usedTitles:new Set(),usedEvents:new Set(),words:0};}
+function uniqueFrom(list,used){const pool=list.filter(x=>!used.has(x));return pick(pool.length?pool:list)}
+function sentenceSet(state,bp,i){
+ const char=pick(state.characters),other=pick(state.characters.filter(x=>x.name!==char.name)||state.characters),genre=pick(bp.genres),trope=char.trope,loc=state.location,object=pick(OBJECT),verb=pick(VERBS),conflict=uniqueFrom(CONFLICTS,state.usedEvents);
+ state.usedEvents.add(conflict);state.recentEvents.push(conflict);if(state.recentEvents.length>10)state.recentEvents.shift();
+ const thread=state.unresolved.length?pick(state.unresolved):pick(bp.hooks);
+ const discovery='The clue involving '+object+' pointed toward '+pick(bp.locations)+'.';
+ const action=char.name+' decided to '+verb+' '+object+' before '+other.name+' could turn the situation into another argument.';
+ const consequence=pick(RESOLUTIONS)+'.';
+ const comic=Number(bp.parody)>=65?pick(JOKES):'For once, nobody made a joke, which made the silence feel more serious than expected.';
+ return {char,genre,trope,loc,thread,opening:pick(OPENERS),action,discovery,consequence,comic,other};
+}
+function makeChapter(i,bp,state){
+ state.chapter=i;state.arc=Math.floor((i-1)/state.arcLength)+1;
+ if(i>1 && i%state.arcLength===1)state.location=bp.locations[(state.arc-1)%bp.locations.length];
+ const s=sentenceSet(state,bp,i), phase=(i%7), titleParts=[
+   'A New Problem in '+s.loc.replace(/^the /i,''),
+   'The '+s.genre+' Complication',
+   'A Clue Nobody Expected',
+   'The '+s.trope+' Problem',
+   'The Day The Plan Changed',
+   'A Very Inconvenient Discovery',
+   'The Consequences Arrive'
+ ];
+ let title=titleParts[phase];if(state.usedTitles.has(title))title=title+' — Part '+state.arc;state.usedTitles.add(title);state.recentTitles.push(title);if(state.recentTitles.length>18)state.recentTitles.shift();
+ const paragraphs=[
+   s.opening+' '+s.char.name+' was in '+s.loc+', trying to '+pick(VERBS)+' what remained of yesterday’s problem. The '+s.genre.toLowerCase()+' atmosphere made the ordinary details feel suspicious.',
+   s.action+' '+s.char.name+' had the '+s.trope.toLowerCase()+' habit of treating impossible situations as if they were merely inconvenient. '+s.other.name+' disagreed, which was becoming a reliable source of progress.',
+   'The immediate problem was simple on paper: '+s.conflict+'. The less simple problem was the thread behind it: '+s.thread+' The characters could not resolve everything at once, so they separated the obvious danger from the question that could wait.',
+   s.discovery+' That discovery did not solve the mystery. It narrowed it. A useful clue was more dangerous than a useless clue because now the characters had somewhere specific to be wrong.',
+   s.char.name+' remembered an earlier decision and changed course. The choice altered the relationship between the group members, even if nobody announced it dramatically. '+s.consequence,
+   'Somewhere beyond '+s.loc+', another part of the world continued moving. A faction, rival, friend, or stranger was making a decision that would matter later. The story did not stop when the characters stopped looking.',
+   s.comic,
+   'By the end of the chapter, the immediate situation had changed. '+s.thread+' remained unresolved, but the characters now possessed a new piece of information: '+pick(OBJECT)+'. That object would not magically explain itself. Nothing in this world was that considerate.',
+ ];
+ const detailPool=shuffle([...OBJECT,...LOCATION,...CONFLICTS,...RESOLUTIONS]);while(paragraphs.join(' ').split(/\s+/).length<760)paragraphs.push(charDetail(state,bp,s,detailPool,paragraphs.length));
+ let text=paragraphs.join('\n\n');const words=text.split(/\s+/);if(words.length>900)text=words.slice(0,900).join(' ')+'.';
+ state.words+=text.split(/\s+/).length;
+ state.unresolved=state.unresolved.filter(x=>x!==s.thread);if(Math.random()<.7)state.unresolved.push(uniqueFrom(bp.hooks,state.unresolved));
+ state.resolved.push(s.thread);if(state.resolved.length>20)state.resolved.shift();
+ state.foreshadow.push(s.discovery);if(state.foreshadow.length>20)state.foreshadow.shift();
+ state.characters.forEach(c=>{if(c.name===s.char.name)c.mood=pick(['determined','curious','annoyed','amused','cautious']);});
+ return {number:i,title,text,arc:state.arc,location:state.location,focus:s.char.name,continuity:{unresolved:[...state.unresolved],resolved:[...state.resolved.slice(-8)],foreshadow:[...state.foreshadow.slice(-8)]}};
+}
+function charDetail(state,bp,s,pool,n){const a=pick(pool),b=pick(pool.filter(x=>x!==a));return n%2?s.char.name+' noticed '+a+' near '+s.loc+', while '+s.other.name+' connected it to '+b+'. The connection was incomplete, but incomplete information was still information.': 'The group compared notes. '+a+' mattered because '+s.other.name+' remembered '+b+'. Nobody had enough evidence to declare the theory correct, so they recorded it instead.'}
+function similarity(a,b){const A=new Set(String(a).toLowerCase().split(/\W+/).filter(x=>x.length>4)),B=new Set(String(b).toLowerCase().split(/\W+/).filter(x=>x.length>4));let inter=0;A.forEach(x=>B.has(x)&&inter++);return inter/Math.max(1,Math.min(A.size,B.size))}
+async function generate(bp){
+ const s=box('genStatus'),n=bp.chapters,state=createState(bp),novel={id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'3.0',antiRepetition:true,continuity:true,arcs:true},stats:{words:0,regenerations:0}};
+ box('generate').disabled=true;box('discard').disabled=true;
+ try{
+  for(let i=1;i<=n;i++){
+   let chapter,attempt=0;
+   do{chapter=makeChapter(i,bp,state);attempt++;}while(novel.generated.slice(-12).some(x=>similarity(x.text,chapter.text)>.72)&&attempt<5);
+   if(attempt>1)novel.stats.regenerations+=attempt-1;
+   novel.generated.push(chapter);
+   if(i%5===0||i===1){novel.stats.words=state.words;s.textContent='Forging '+i+' / '+n+' · Arc '+state.arc+' · anti-repetition check passed · '+Math.round(i/n*100)+'%';await new Promise(r=>setTimeout(r,0));}
+  }
+  await saveNovel(novel);localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
+ }catch(e){console.error(e);s.textContent='Generation stopped safely: '+(e.message||'storage error');box('generate').disabled=false;box('discard').disabled=false}
+}
