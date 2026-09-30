@@ -19,7 +19,7 @@
 
 The seeded engine makes procedural choices reproducible when the same seed is supplied. Generation checkpoints retain the story state and RNG state so interrupted generation can continue from the saved point.
 
-## Storage 3.0 + Lazy Reader 11.0
+## Storage 4.0 + Lazy Reader 11.0
 
 Large manuscripts are no longer stored as one giant IndexedDB object. The reader also loads only the chapter being read, while chapter titles/metadata are indexed separately.
 
