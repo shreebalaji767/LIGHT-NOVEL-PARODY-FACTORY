@@ -1,6 +1,6 @@
 # LIGHT NOVEL PARODY FACTORY
 
-**Factory 10.0** — a static, local-first light-novel parody studio with a gothic literary interface.
+**Factory 11.0** — a static, local-first light-novel parody studio with a gothic literary interface.
 
 ## Architecture
 - Static GitHub Pages compatible site
@@ -19,9 +19,9 @@
 
 The seeded engine makes procedural choices reproducible when the same seed is supplied. Generation checkpoints retain the story state and RNG state so interrupted generation can continue from the saved point.
 
-## Storage 3.0
+## Storage 3.0 + Lazy Reader 11.0
 
-Large manuscripts are no longer stored as one giant IndexedDB object.
+Large manuscripts are no longer stored as one giant IndexedDB object. The reader also loads only the chapter being read, while chapter titles/metadata are indexed separately.
 
 The browser database now uses:
 - `novels` — lightweight book metadata and generation state
