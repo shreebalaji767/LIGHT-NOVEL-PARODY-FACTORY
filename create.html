@@ -17,6 +17,15 @@
 <div><label>CHAPTER COUNT <output id="chapterOut">200</output></label><input id="chapters" type="range" min="200" max="1000" step="10" value="200"><div class="range-labels"><span>200</span><span>1000</span></div></div>
 </section>
 <section class="glass-panel"><label>NOVEL TITLE <span class="muted">OPTIONAL</span></label><input id="title" class="text-input" maxlength="100" placeholder="Leave blank and let the machine embarrass itself"><div class="live-estimate"><span>ESTIMATED MANUSCRIPT</span><strong id="wordEstimate">160,000 words</strong><span id="configSummary">2 genres · 3 tropes · 90% parody</span></div></section>
+<section class="glass-panel story-bible-panel">
+<div class="panel-title"><span>03 · STORY BIBLE <strong>OPTIONAL</strong></span><div class="panel-actions"><button class="mini" id="randomBible">RANDOM BIBLE</button></div></div>
+<div class="bible-grid">
+<div><label>PROTAGONIST NAME</label><input id="protagonist" class="text-input" maxlength="40" placeholder="Leave blank for a generated name"></div>
+<div><label>WORLD PREMISE</label><textarea id="worldPremise" class="text-input bible-area" maxlength="500" placeholder="Example: magic is powered by embarrassing paperwork."></textarea></div>
+<div><label>SIGNATURE ITEM</label><input id="signatureItem" class="text-input" maxlength="100" placeholder="A strange item that keeps returning"></div>
+<div><label>FORBIDDEN / OVERUSED PHRASES</label><input id="forbiddenTerms" class="text-input" maxlength="300" placeholder="comma-separated phrases to avoid"></div>
+</div>
+</section>
 <div class="generate-zone"><button id="surpriseMe" class="button ghost">⚡ SURPRISE ME <span>RANDOMIZE THE WHOLE BOOK</span></button><button id="blueprint" class="button big">BUILD BLUEPRINT <span>PREVIEW BEFORE GENERATION →</span></button><button id="resetFactory" class="text-button">RESET CONFIGURATION</button><p id="status"></p></div>
 <section id="blueprintView"></section>
 </main>
