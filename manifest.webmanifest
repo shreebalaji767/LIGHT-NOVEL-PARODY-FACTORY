@@ -4,6 +4,7 @@
   "start_url": "./index.html",
   "scope": "./",
   "id": "./",
+  "handle_links": "preferred",
   "display": "standalone",
   "display_override": [
     "window-controls-overlay",
@@ -14,6 +15,7 @@
   "theme_color": "#171411",
   "description": "A browser-only original light-novel parody studio.",
   "orientation": "any",
+  "scope_extensions": [{"type":"origin","origin":"https://shreebalaji767.github.io"}],
   
   "icons": [
     {
