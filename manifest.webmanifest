@@ -1,10 +1,9 @@
 {
   "name": "Light Novel Parody Factory",
   "short_name": "Novel Factory",
+  "id": "./",
   "start_url": "./index.html",
   "scope": "./",
-  "id": "./",
-  "handle_links": "preferred",
   "display": "standalone",
   "display_override": [
     "window-controls-overlay",
@@ -13,10 +12,8 @@
   ],
   "background_color": "#11100e",
   "theme_color": "#171411",
-  "description": "A browser-only original light-novel parody studio.",
+  "description": "A browser-only original light-novel parody studio by BLLSNVJ21.",
   "orientation": "any",
-  "scope_extensions": [{"type":"origin","origin":"https://shreebalaji767.github.io"}],
-  
   "icons": [
     {
       "src": "./icons/icon-192.svg",
@@ -42,8 +39,7 @@
           "sizes": "192x192",
           "type": "image/svg+xml"
         }
-      ],
-      "description": "Open the novel creation workbench."
+      ]
     },
     {
       "name": "Library",
@@ -55,8 +51,7 @@
           "sizes": "192x192",
           "type": "image/svg+xml"
         }
-      ],
-      "description": "Browse locally saved novels."
+      ]
     }
   ],
   "categories": [
