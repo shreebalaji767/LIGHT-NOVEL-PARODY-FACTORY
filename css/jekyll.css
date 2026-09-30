@@ -379,3 +379,7 @@ html{scroll-padding-top:90px}body{padding-bottom:env(safe-area-inset-bottom)}.ma
 
 /* Factory v11 accessibility and modern viewport polish */
 :focus-visible{outline:2px solid var(--gold2);outline-offset:3px}button,a,input,textarea,select{touch-action:manipulation}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}@media (max-width:720px){.masthead{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.pwa-settings-button{bottom:max(16px,env(safe-area-inset-bottom));right:max(16px,env(safe-area-inset-right))}}
+
+
+/* FACTORY 13.0 — library batch studio */
+.library-summary #selectedCount{color:#9a7a42}.book-select{width:17px;height:17px;accent-color:#9a7a42;cursor:pointer;margin-right:8px;vertical-align:middle}.book-index{display:flex;align-items:center;gap:6px}.book-card.selected{background:rgba(164,123,54,.07);box-shadow:inset 3px 0 0 #a47b36}.library-actions .mini:disabled{opacity:.35;cursor:not-allowed}.library-actions .danger-tool{color:#9a4b3d}@media(max-width:760px){.book-index{justify-content:flex-start}.book-select{width:20px;height:20px}.library-summary #selectedCount{width:100%}}
