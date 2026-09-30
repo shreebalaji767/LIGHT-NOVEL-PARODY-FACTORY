@@ -1,4 +1,4 @@
-const CACHE='lnpf-v5';
+const CACHE='lnpf-v6';
 const APP_SHELL=['./','./index.html','./create.html','./library.html','./reader.html','./css/jekyll.css','./js/storage.js','./js/app.js','./js/library.js','./js/reader.js','./js/pwa.js','./manifest.webmanifest','./icons/icon-192.svg','./icons/icon-512.svg'];
 const OFFLINE='./index.html';
 
@@ -13,6 +13,7 @@ self.addEventListener('activate',event=>event.waitUntil(
 
 self.addEventListener('message',event=>{
   if(event.data&&event.data.type==='SKIP_WAITING') self.skipWaiting();
+  if(event.data&&event.data.type==='CLEAR_APP_CACHE') event.waitUntil(caches.delete(CACHE));
 });
 
 async function networkFirst(request){
