@@ -81,7 +81,7 @@ function makeChapter(i,bp,state){
    'By the end of the chapter, the immediate situation had changed. '+s.thread+' remained unresolved, but the characters now possessed a new piece of information: '+pick(OBJECT)+'. That object would not magically explain itself. Nothing in this world was that considerate.',
  ];
  const detailPool=shuffle([...(bp.bible?.signatureItem?[bp.bible.signatureItem]:[]),...OBJECT,...LOCATION,...CONFLICTS,...RESOLUTIONS]);while(paragraphs.join(' ').split(/\s+/).length<760)paragraphs.push(charDetail(state,bp,s,detailPool,paragraphs.length));
- let text=paragraphs.join('\\n\\n');const banned=(bp.bible?.forbiddenTerms||'').split(',').map(x=>x.trim()).filter(Boolean);for(const term of banned)text=text.replace(new RegExp(term.replace(/[.*+?^${}()|[\\]\\]/g,'\\\\let text=paragraphs.join('\\n\\n');'),'gi','');const words=text.split(/\s+/);if(words.length>900)text=words.slice(0,900).join(' ')+'.';
+ let text=paragraphs.join('\\n\\n');const banned=(bp.bible?.forbiddenTerms||'').split(',').map(x=>x.trim()).filter(Boolean);for(const term of banned){const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');text=text.replace(new RegExp(escaped,'gi'),'');}const words=text.split(/\s+/);if(words.length>900)text=words.slice(0,900).join(' ')+'.';
  state.words+=text.split(/\s+/).length;
  state.unresolved=state.unresolved.filter(x=>x!==s.thread);if(Math.random()<.7)state.unresolved.push(uniqueFrom(bp.hooks,state.unresolved));
  state.resolved.push(s.thread);if(state.resolved.length>20)state.resolved.shift();
