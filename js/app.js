@@ -125,14 +125,14 @@ function similarity(a,b){const A=new Set(String(a).toLowerCase().split(/\W+/).fi
 let generationCancelled=false;let activeGeneration=null;
 function addGenerationControls(){const zone=document.querySelector('.generate-zone');if(!zone||document.getElementById('cancelGeneration'))return;const b=document.createElement('button');b.id='cancelGeneration';b.className='text-button';b.textContent='STOP GENERATION';b.onclick=()=>{generationCancelled=true};zone.appendChild(b)}
 async function generate(bp,resumeNovel=null,resumeState=null){
- generationCancelled=false;if(resumeNovel?.checkpoint?.rngState!=null){SEED=resumeNovel.checkpoint.seed||bp.seed||SEED;RNG_STATE=resumeNovel.checkpoint.rngState;RNG=()=>{RNG_STATE+=0x6D2B79F5;let x=RNG_STATE;x=Math.imul(x^(x>>>15),x|1);x^=x+Math.imul(x^(x>>>7),x|61);return((x^(x>>>14))>>>0)/4294967296}}else if(bp.seed)setSeed(bp.seed);const s=box('genStatus'),n=bp.chapters,state=resumeState||createState(bp),novel=resumeNovel||{id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:ENGINE_VERSION,antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true,resumable:true,exactWordTarget:WORD_TARGET,genreFlavor:true,parodyDNA:true,narrativeLaws:true,factoryAnomalies:true,fingerprint:factoryFingerprint(bp)},stats:{words:0,regenerations:0,exact800:0}};const start=novel.generated.length+1;activeGeneration={novel,state};
+ generationCancelled=false;if(resumeNovel?.checkpoint?.rngState!=null){SEED=resumeNovel.checkpoint.seed||bp.seed||SEED;RNG_STATE=resumeNovel.checkpoint.rngState;RNG=()=>{RNG_STATE+=0x6D2B79F5;let x=RNG_STATE;x=Math.imul(x^(x>>>15),x|1);x^=x+Math.imul(x^(x>>>7),x|61);return((x^(x>>>14))>>>0)/4294967296}}else if(bp.seed)setSeed(bp.seed);const s=box('genStatus'),n=bp.chapters,state=resumeState||createState(bp),novel=resumeNovel||{id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:ENGINE_VERSION,antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true,resumable:true,exactWordTarget:WORD_TARGET,genreFlavor:true,parodyDNA:true,narrativeLaws:true,factoryAnomalies:true,fingerprint:factoryFingerprint(bp)},stats:{words:0,regenerations:0,exact800:0}};const start=novel.generated.length+1;novel.stats.generationStartedAt=novel.stats.generationStartedAt||Date.now();activeGeneration={novel,state};
  box('generate').disabled=true;box('discard').disabled=true;window.onbeforeunload=()=> 'Generation is in progress. Leave this page only if you want to stop it.';
  try{
   for(let i=start;i<=n;i++){
    if(generationCancelled)throw new Error('Generation cancelled by user.');
    let chapter,attempt=0,accepted=false;
    const baseState=JSON.stringify({...state,usedTitles:[...state.usedTitles],usedEvents:[...state.usedEvents]});
-   const baseRng=RNG_STATE;
+   const baseRng=RNG_STATE;const chapterStarted=Date.now();
    do{
     if(attempt>0){
       const restored=JSON.parse(baseState);
@@ -145,9 +145,9 @@ async function generate(bp,resumeNovel=null,resumeState=null){
     accepted=!novel.generated.slice(-12).some(x=>similarity(x.text,chapter.text)>.72);
    }while(!accepted&&attempt<5);
    if(attempt>1)novel.stats.regenerations+=attempt-1;
-   if(chapter.text.split(/\s+/).filter(Boolean).length!==WORD_TARGET)throw new Error('Chapter word-count integrity check failed.');novel.stats.exact800++;novel.stats.lastGeneratedAt=Date.now();novel.generated.push(chapter);
-   if(i%GENERATOR_YIELD===0){await new Promise(r=>setTimeout(r,0));}
-   if(i%10===0){novel.stats.words=state.words;novel.checkpoint={chapter:i,state:JSON.parse(JSON.stringify(state)),rngState:RNG_STATE,seed:SEED};await saveNovel(novel);}
+   if(chapter.text.split(/\s+/).filter(Boolean).length!==WORD_TARGET)throw new Error('Chapter word-count integrity check failed.');novel.stats.exact800++;novel.stats.lastGeneratedAt=Date.now();novel.stats.lastChapterWords=WORD_TARGET;novel.stats.totalGenerationMs=(novel.stats.totalGenerationMs||0)+(Date.now()-chapterStarted);novel.generated.push(chapter);
+   if(i%GENERATOR_YIELD===0){const pct=Math.round(i/n*100);const elapsed=Math.max(1,Date.now()-Number(novel.stats.generationStartedAt||Date.now()));const perChapter=elapsed/i;const eta=Math.max(0,Math.round((n-i)*perChapter/1000));s.textContent='FORGING '+i+' / '+n+' · '+pct+'% · ARC '+state.arc+' · ETA '+(eta<60?eta+'s':Math.ceil(eta/60)+'m')+' · CHECKPOINT READY';await new Promise(r=>setTimeout(r,0));}
+   novel.stats.words=state.words;novel.checkpoint={chapter:i,state:JSON.parse(JSON.stringify(state)),rngState:RNG_STATE,seed:SEED};await saveNovel(novel);
    if(i%5===0||i===1){novel.stats.words=state.words;s.textContent='Forging '+i+' / '+n+' · Arc '+state.arc+' · anti-repetition check passed · '+Math.round(i/n*100)+'%';await new Promise(r=>setTimeout(r,0));}
   }
   await saveNovel(novel);delete novel.checkpoint;await saveNovel(novel);window.onbeforeunload=null;activeGeneration=null;localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
