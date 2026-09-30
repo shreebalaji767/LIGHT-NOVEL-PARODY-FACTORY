@@ -1,22 +1,22 @@
-/* LIGHT NOVEL PARODY FACTORY — STORY ENGINE 5.1
+/* LIGHT NOVEL PARODY FACTORY — STORY ENGINE 8.0
    Procedural long-form engine with continuity, anti-repetition, pacing and safe persistence.
 */
 const AUTHOR='BLLSNVJ21';const GENRES=['Isekai','Fantasy','Action','Adventure','Romance','Comedy','Horror','Mystery','School','Villainess','Cultivation','Sci-Fi','Reincarnation','Game/System','Dungeon','Demon Lord','Slice of Life','Supernatural','Sports','Mecha','Magical Girl','Post-Apocalypse','Cyberpunk','Historical','Military','Cooking','Otome','Time Travel','Survival','Political Intrigue','Music','Western','Pirates','Steampunk','Urban Fantasy','Dark Fantasy'];
 const TROPES=['Overpowered Protagonist','Weak-to-Strong','Accidental Hero','Villainess Reincarnation','Deadpan Genius','Hot-Blooded Rival','Chaotic Best Friend','Mysterious Transfer Student','Ancient Sealed Power','Hidden Royalty','Fake Weakness','System Window Addict','Dense Romantic Lead','Tsundere Rival','Unreasonably Hungry Hero','Mentor Who Knows Too Much','Comic Relief Who Saves Everyone','Secret Final Boss','Prophecy That Makes No Sense','Nobody Reads The Instructions'];
 const NAMES=['Alden','Mira','Rin','Kael','Liora','Yuki','Sora','Vera','Bram','Noel','Iris','Gideon','Talia','Ren','Marek','Nia','Cato','Elara','Jun','Selene'];
-const box=id=>document.getElementById(id);const safeBox=id=>document.getElementById(id);const SETTINGS={tone:50,romance:30,comedy:70,serious:30,violence:20};let selectedGenres=['Isekai','Comedy'],selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];
+const box=id=>document.getElementById(id);const safeBox=id=>document.getElementById(id);const SETTINGS={tone:50,romance:30,comedy:70,serious:30,violence:20};let BIBLE={protagonist:'',worldPremise:'',signatureItem:'',forbiddenTerms:''};let selectedGenres=['Isekai','Comedy'],selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];
 const shuffle=a=>[...a].sort(()=>Math.random()-.5),pick=a=>a[Math.floor(Math.random()*a.length)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function updateUI(){const p=Number(box('parody').value),c=Number(box('chapters').value);box('genreCount').textContent=selectedGenres.length+' SELECTED';box('tropeCount').textContent=selectedTropes.length+' SELECTED';box('parodyOut').value=p+'%';box('chapterOut').value=c;box('wordEstimate').textContent=(c*800).toLocaleString()+' words';box('configSummary').textContent=selectedGenres.length+' genres · '+selectedTropes.length+' tropes · '+p+'% parody';readSettings();localStorage.setItem('lnpf-draft',JSON.stringify({genres:selectedGenres,tropes:selectedTropes,parody:p,chapters:c,title:box('title').value,settings:{...SETTINGS}}));}
+function updateUI(){const p=Number(box('parody').value),c=Number(box('chapters').value);box('genreCount').textContent=selectedGenres.length+' SELECTED';box('tropeCount').textContent=selectedTropes.length+' SELECTED';box('parodyOut').value=p+'%';box('chapterOut').value=c;box('wordEstimate').textContent=(c*800).toLocaleString()+' words';box('configSummary').textContent=selectedGenres.length+' genres · '+selectedTropes.length+' tropes · '+p+'% parody';readSettings();localStorage.setItem('lnpf-draft',JSON.stringify({genres:selectedGenres,tropes:selectedTropes,parody:p,chapters:c,title:box('title').value,settings:{...SETTINGS},bible:{...BIBLE}}));}
 function cards(list,target,selected){target.innerHTML='';list.forEach(x=>{const e=document.createElement('button');e.type='button';e.className='select-card'+(selected.includes(x)?' active':'');e.textContent=x;e.setAttribute('aria-pressed',selected.includes(x));e.onclick=()=>{const i=selected.indexOf(x);i>=0?selected.splice(i,1):selected.push(x);cards(list,target,selected);updateUI()};target.appendChild(e)})}
-function restoreDraft(){try{const d=JSON.parse(localStorage.getItem('lnpf-draft')||'null');if(d){selectedGenres=Array.isArray(d.genres)&&d.genres.length?d.genres:selectedGenres;selectedTropes=Array.isArray(d.tropes)&&d.tropes.length?d.tropes:selectedTropes;if(d.parody!=null)box('parody').value=d.parody;if(d.chapters!=null)box('chapters').value=d.chapters;if(d.title)box('title').value=d.title;if(d.settings)Object.keys(SETTINGS).forEach(k=>{if(d.settings[k]!=null&&safeBox(k))safeBox(k).value=d.settings[k]})}}catch{}}
+function restoreDraft(){try{const d=JSON.parse(localStorage.getItem('lnpf-draft')||'null');if(d){selectedGenres=Array.isArray(d.genres)&&d.genres.length?d.genres:selectedGenres;selectedTropes=Array.isArray(d.tropes)&&d.tropes.length?d.tropes:selectedTropes;if(d.parody!=null)box('parody').value=d.parody;if(d.chapters!=null)box('chapters').value=d.chapters;if(d.title)box('title').value=d.title;if(d.settings)Object.keys(SETTINGS).forEach(k=>{if(d.settings[k]!=null&&safeBox(k))safeBox(k).value=d.settings[k]});if(d.bible){Object.keys(BIBLE).forEach(k=>{if(d.bible[k]!=null)BIBLE[k]=String(d.bible[k]);if(safeBox(k))safeBox(k).value=BIBLE[k]})}}}catch{}}
 restoreDraft();cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI();
 box('allGenres').onclick=()=>{selectedGenres=selectedGenres.length===GENRES.length?[]:[...GENRES];cards(GENRES,box('genres'),selectedGenres);updateUI()};
 box('allTropes').onclick=()=>{selectedTropes=selectedTropes.length===TROPES.length?[]:[...TROPES];cards(TROPES,box('tropes'),selectedTropes);updateUI()};
 box('randomGenres').onclick=()=>{selectedGenres=shuffle(GENRES).slice(0,Math.floor(Math.random()*4)+2);cards(GENRES,box('genres'),selectedGenres);updateUI()};
 box('randomTropes').onclick=()=>{selectedTropes=shuffle(TROPES).slice(0,Math.floor(Math.random()*5)+3);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
-box('resetFactory').onclick=()=>{localStorage.removeItem('lnpf-draft');selectedGenres=['Isekai','Comedy'];selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];box('parody').value=90;box('chapters').value=200;box('title').value='';box('blueprintView').innerHTML='';box('status').textContent='Configuration reset.';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
-box('parody').oninput=updateUI;box('chapters').oninput=updateUI;box('title').oninput=updateUI;['tone','romance','comedy','serious','violence'].forEach(id=>{const e=safeBox(id);if(e)e.oninput=()=>{readSettings();updateUI()}});const surprise=safeBox('surpriseMe');if(surprise)surprise.onclick=randomizeEverything;
+box('resetFactory').onclick=()=>{localStorage.removeItem('lnpf-draft');selectedGenres=['Isekai','Comedy'];selectedTropes=['Overpowered Protagonist','Chaotic Best Friend','Prophecy That Makes No Sense'];box('parody').value=90;box('chapters').value=200;box('title').value='';Object.keys(BIBLE).forEach(k=>{BIBLE[k]='';if(safeBox(k))safeBox(k).value=''});box('blueprintView').innerHTML='';box('status').textContent='Configuration reset.';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()};
+box('parody').oninput=updateUI;box('chapters').oninput=updateUI;box('title').oninput=updateUI;['tone','romance','comedy','serious','violence'].forEach(id=>{const e=safeBox(id);if(e)e.oninput=()=>{readSettings();updateUI()}});Object.keys(BIBLE).forEach(id=>{const e=safeBox(id);if(e)e.oninput=()=>{BIBLE[id]=e.value;updateUI()}});const surprise=safeBox('surpriseMe');if(surprise)surprise.onclick=randomizeEverything;const randomBible=safeBox('randomBible');if(randomBible)randomBible.onclick=()=>{BIBLE.protagonist=pick(NAMES);BIBLE.worldPremise=pick(['magic is powered by paperwork','every dungeon has a customer-service desk','prophecies are written by exhausted interns','the kingdom is run by competitive cooking','time travel requires returning library books']);BIBLE.signatureItem=pick(OBJECT);BIBLE.forbiddenTerms='very, suddenly, literally';Object.keys(BIBLE).forEach(k=>{if(safeBox(k))safeBox(k).value=BIBLE[k]});updateUI()};
 
 function readSettings(){Object.keys(SETTINGS).forEach(k=>{const e=safeBox(k);if(e)SETTINGS[k]=Number(e.value)})}
 function randomizeEverything(){selectedGenres=shuffle(GENRES).slice(0,Math.floor(Math.random()*5)+2);selectedTropes=shuffle(TROPES).slice(0,Math.floor(Math.random()*6)+3);box('parody').value=Math.floor(Math.random()*101);box('chapters').value=(Math.floor(Math.random()*81)+20)*10;box('title').value='';cards(GENRES,box('genres'),selectedGenres);cards(TROPES,box('tropes'),selectedTropes);updateUI()}
@@ -33,15 +33,15 @@ const OPENERS=['Morning arrived with the confidence of someone who had never see
 
 function makeTitle(){return pick(TITLE_A)+' '+pick(TITLE_B)}
 function makeBlueprint(){
- const title=box('title').value.trim()||makeTitle(), genres=selectedGenres.length?selectedGenres:['Fantasy'], tropes=selectedTropes.length?selectedTropes:['Accidental Hero'];
+ const title=box('title').value.trim()||makeTitle(), genres=selectedGenres.length?selectedGenres:['Fantasy'], tropes=selectedTropes.length?selectedTropes:['Accidental Hero'];readSettings();Object.keys(BIBLE).forEach(k=>{if(safeBox(k))BIBLE[k]=safeBox(k).value.trim()});
  const used=new Set(),chars=[];for(const role of ['PROTAGONIST','RIVAL','COMPANION','MENTOR']){let name;do{name=pick(NAMES)}while(used.has(name));used.add(name);chars.push({role,name,trope:pick(tropes)})}
  const locations=shuffle(LOCATION).slice(0,5),hooks=shuffle(CONFLICTS).slice(0,4);
- return {title,author:AUTHOR,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),settings:{...SETTINGS},characters:chars,locations,hooks,engineVersion:'5.1',created:Date.now()};
+ if(BIBLE.protagonist)chars[0].name=BIBLE.protagonist;return {title,author:AUTHOR,genres,tropes,parody:Number(box('parody').value),chapters:Number(box('chapters').value),settings:{...SETTINGS},bible:{...BIBLE},characters:chars,locations,hooks,engineVersion:'8.0',created:Date.now()};
 }
 function renderBlueprint(bp){
  const root=box('blueprintView');
  root.innerHTML='<div class="blueprint glass-panel"><div class="blueprint-top"><div><p class="eyebrow">BLUEPRINT READY · STORY ENGINE 5.1</p><h2>'+esc(bp.title)+'</h2><p class="muted">Continuity memory · anti-repetition · arc pacing · character state · foreshadowing</p></div><span class="status-pill">READY</span></div><div class="bp-author"><span>AUTHOR</span><strong>BLLSNVJ21</strong></div><div class="bp-stats"><div><b>'+bp.chapters+'</b><span>CHAPTERS</span></div><div><b>'+bp.parody+'%</b><span>PARODY</span></div><div><b>'+bp.genres.length+'</b><span>GENRES</span></div><div><b>'+bp.tropes.length+'</b><span>TROPES</span></div></div><div class="bp-section"><h3>GENRES & TROPES</h3><div class="tag-list">'+[...bp.genres,...bp.tropes].map(x=>'<span>'+esc(x)+'</span>').join('')+'</div></div><div class="bp-section"><h3>CHARACTERS</h3><div class="character-grid">'+bp.characters.map(c=>'<article><small>'+esc(c.role)+'</small><strong>'+esc(c.name)+'</strong><p>'+esc(c.trope)+'</p></article>').join('')+'</div></div><div class="bp-section"><h3>WORLD & STORY THREADS</h3><p>'+bp.locations.map(esc).join(' · ')+'</p><ul>'+bp.hooks.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div><div class="bp-actions"><button class="button big" id="generate">GENERATE CHAPTERS <span>CONTINUITY ENGINE →</span></button><button class="button ghost" id="discard">DISCARD BLUEPRINT</button></div><p id="genStatus"></p></div>';
- box('generate').onclick=()=>generate(bp);box('discard').onclick=()=>{root.innerHTML='';box('status').textContent='Blueprint discarded.'};
+ box('generate').onclick=()=>{addGenerationControls();generate(bp)};box('discard').onclick=()=>{root.innerHTML='';box('status').textContent='Blueprint discarded.'};addGenerationControls();
 }
 box('blueprint').onclick=()=>{box('status').textContent='Building story bible and continuity plan...';const bp=makeBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. The engine will prevent repetitive chapter construction.'};
 
@@ -71,7 +71,7 @@ function makeChapter(i,bp,state){
  ];
  let title=titleParts[phase];if(state.usedTitles.has(title))title=title+' — Part '+state.arc;state.usedTitles.add(title);state.recentTitles.push(title);if(state.recentTitles.length>18)state.recentTitles.shift();
  const tone=Number(bp.settings?.tone??50),serious=Number(bp.settings?.serious??30),romance=Number(bp.settings?.romance??30),intensity=Number(bp.settings?.violence??20); const paragraphs=[
-   s.opening+' '+s.char.name+' was in '+s.loc+', trying to '+pick(VERBS)+' what remained of yesterday’s problem. The '+s.genre.toLowerCase()+' atmosphere made the ordinary details feel suspicious.',
+   ((bp.bible?.worldPremise?bp.bible.worldPremise+'. ':'')+s.opening)+' '+s.char.name+' was in '+s.loc+', trying to '+pick(VERBS)+' what remained of yesterday’s problem. The '+s.genre.toLowerCase()+' atmosphere made the ordinary details feel suspicious.',
    s.action+' '+s.char.name+' had the '+s.trope.toLowerCase()+' habit of treating impossible situations as if they were merely inconvenient. '+s.other.name+' disagreed, which was becoming a reliable source of progress.',
    'The immediate problem was simple on paper: '+s.conflict+'. The less simple problem was the thread behind it: '+s.thread+' The characters could not resolve everything at once, so they separated the obvious danger from the question that could wait.',
    s.discovery+' That discovery did not solve the mystery. It narrowed it. A useful clue was more dangerous than a useless clue because now the characters had somewhere specific to be wrong.',
@@ -80,8 +80,8 @@ function makeChapter(i,bp,state){
    s.comic+(romance>60?' '+s.char.name+' also noticed that '+s.other.name+' had become unexpectedly important to the group.':'') ,
    'By the end of the chapter, the immediate situation had changed. '+s.thread+' remained unresolved, but the characters now possessed a new piece of information: '+pick(OBJECT)+'. That object would not magically explain itself. Nothing in this world was that considerate.',
  ];
- const detailPool=shuffle([...OBJECT,...LOCATION,...CONFLICTS,...RESOLUTIONS]);while(paragraphs.join(' ').split(/\s+/).length<760)paragraphs.push(charDetail(state,bp,s,detailPool,paragraphs.length));
- let text=paragraphs.join('\\n\\n');const words=text.split(/\s+/);if(words.length>900)text=words.slice(0,900).join(' ')+'.';
+ const detailPool=shuffle([...(bp.bible?.signatureItem?[bp.bible.signatureItem]:[]),...OBJECT,...LOCATION,...CONFLICTS,...RESOLUTIONS]);while(paragraphs.join(' ').split(/\s+/).length<760)paragraphs.push(charDetail(state,bp,s,detailPool,paragraphs.length));
+ let text=paragraphs.join('\\n\\n');const banned=(bp.bible?.forbiddenTerms||'').split(',').map(x=>x.trim()).filter(Boolean);for(const term of banned)text=text.replace(new RegExp(term.replace(/[.*+?^${}()|[\\]\\]/g,'\\\\let text=paragraphs.join('\\n\\n');'),'gi','');const words=text.split(/\s+/);if(words.length>900)text=words.slice(0,900).join(' ')+'.';
  state.words+=text.split(/\s+/).length;
  state.unresolved=state.unresolved.filter(x=>x!==s.thread);if(Math.random()<.7)state.unresolved.push(uniqueFrom(bp.hooks,state.unresolved));
  state.resolved.push(s.thread);if(state.resolved.length>20)state.resolved.shift();
@@ -91,18 +91,13 @@ function makeChapter(i,bp,state){
 }
 function charDetail(state,bp,s,pool,n){const a=pick(pool),b=pick(pool.filter(x=>x!==a));return n%2?s.char.name+' noticed '+a+' near '+s.loc+', while '+s.other.name+' connected it to '+b+'. The connection was incomplete, but incomplete information was still information.': 'The group compared notes. '+a+' mattered because '+s.other.name+' remembered '+b+'. Nobody had enough evidence to declare the theory correct, so they recorded it instead.'}
 function similarity(a,b){const A=new Set(String(a).toLowerCase().split(/\W+/).filter(x=>x.length>4)),B=new Set(String(b).toLowerCase().split(/\W+/).filter(x=>x.length>4));let inter=0;A.forEach(x=>B.has(x)&&inter++);return inter/Math.max(1,Math.min(A.size,B.size))}
-let generationCancelled=false;
-function addGenerationControls(){
- const zone=document.querySelector('.generate-zone');if(!zone||document.getElementById('cancelGeneration'))return;
- const b=document.createElement('button');b.id='cancelGeneration';b.className='text-button';b.textContent='STOP GENERATION';b.onclick=()=>{generationCancelled=true};
- zone.appendChild(b);
-}
-addGenerationControls();
-async function generate(bp){
- const s=box('genStatus'),n=bp.chapters,state=createState(bp),novel={id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'5.1',antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true},stats:{words:0,regenerations:0}};
+let generationCancelled=false;let activeGeneration=null;
+function addGenerationControls(){const zone=document.querySelector('.generate-zone');if(!zone||document.getElementById('cancelGeneration'))return;const b=document.createElement('button');b.id='cancelGeneration';b.className='text-button';b.textContent='STOP GENERATION';b.onclick=()=>{generationCancelled=true};zone.appendChild(b)}
+async function generate(bp,resumeNovel=null,resumeState=null){
+ generationCancelled=false;const s=box('genStatus'),n=bp.chapters,state=resumeState||createState(bp),novel=resumeNovel||{id:crypto.randomUUID(),...bp,created:Date.now(),position:0,generated:[],engine:{version:'8.0',antiRepetition:true,continuity:true,arcs:true,checkpointing:true,originality:true,resumable:true},stats:{words:0,regenerations:0}};const start=novel.generated.length+1;activeGeneration={novel,state};
  box('generate').disabled=true;box('discard').disabled=true;window.onbeforeunload=()=> 'Generation is in progress. Leave this page only if you want to stop it.';
  try{
-  for(let i=1;i<=n;i++){
+  for(let i=start;i<=n;i++){
    if(generationCancelled)throw new Error('Generation cancelled by user.');
    let chapter,attempt=0;
    do{chapter=makeChapter(i,bp,state);attempt++;}while(novel.generated.slice(-12).some(x=>similarity(x.text,chapter.text)>.72)&&attempt<5);
@@ -111,6 +106,17 @@ async function generate(bp){
    if(i%10===0){novel.stats.words=state.words;novel.checkpoint={chapter:i,state:JSON.parse(JSON.stringify(state))};await saveNovel(novel);}
    if(i%5===0||i===1){novel.stats.words=state.words;s.textContent='Forging '+i+' / '+n+' · Arc '+state.arc+' · anti-repetition check passed · '+Math.round(i/n*100)+'%';await new Promise(r=>setTimeout(r,0));}
   }
-  await saveNovel(novel);window.onbeforeunload=null;localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
- }catch(e){console.error(e);try{await saveNovel(novel)}catch{}s.textContent='Generation stopped safely: '+(e.message||'storage error');box('generate').disabled=false;box('discard').disabled=false}
+  await saveNovel(novel);delete novel.checkpoint;await saveNovel(novel);window.onbeforeunload=null;activeGeneration=null;localStorage.removeItem('lnpf-draft');location.href='reader.html?id='+encodeURIComponent(novel.id);
+ }catch(e){console.error(e);novel.stats.words=state.words;novel.checkpoint={chapter:novel.generated.length,state:JSON.parse(JSON.stringify(state))};try{await saveNovel(novel)}catch{}window.onbeforeunload=null;activeGeneration=null;s.textContent='Generation stopped safely at chapter '+novel.generated.length+': '+(e.message||'storage error');box('generate').disabled=false;box('discard').disabled=false}
 }
+
+async function restoreCheckpointState(bp,novel){
+ const raw=novel.checkpoint?.state;if(!raw)return null;
+ const state=raw;state.usedTitles=new Set((novel.generated||[]).map(x=>x.title));state.usedEvents=new Set(state.recentEvents||[]);state.recentTitles=state.recentTitles||[];state.recentPhrases=state.recentPhrases||[];state.recentEvents=state.recentEvents||[];state.resolved=state.resolved||[];state.unresolved=state.unresolved||[];state.foreshadow=state.foreshadow||[];state.characters=state.characters||bp.characters.map(c=>({...c,mood:'uncertain',goal:'understand what is happening',relationship:0}));return state;
+}
+async function resumeFromQuery(){
+ const rid=new URLSearchParams(location.search).get('resume');if(!rid)return;
+ try{const n=await getNovel(rid);if(!n||!n.checkpoint||n.generated.length>=n.chapters)return;
+ const zone=document.querySelector('.generate-zone');const b=document.createElement('button');b.className='button big';b.id='resumeGeneration';b.innerHTML='RESUME GENERATION <span>CONTINUE FROM CHAPTER '+(n.checkpoint.chapter+1)+' →</span>';zone.prepend(b);b.onclick=async()=>{b.disabled=true;const state=await restoreCheckpointState(n,n);renderBlueprint(n);box('generate').textContent='RESUME CHAPTERS';box('generate').onclick=()=>generate(n,n,state);box('genStatus').textContent='Checkpoint loaded. Ready to continue.'};box('status').textContent='A resumable generation was found in your local library.'}catch(e){console.warn(e)}
+}
+setTimeout(resumeFromQuery,0);
