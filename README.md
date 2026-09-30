@@ -29,7 +29,7 @@ The browser database now uses:
 - `chapterIndex` — lightweight chapter navigation metadata
 - `meta` — application metadata
 
-Existing schema-2 books are migrated automatically during the IndexedDB upgrade. Legacy v1 books are also imported when available.
+Existing schema-2/legacy chapter data are migrated automatically during the IndexedDB upgrade. Legacy v1 books are also imported when available.
 
 The Library loads lightweight metadata for fast browsing. Full chapter data is assembled only when a book is opened or exported.
 
