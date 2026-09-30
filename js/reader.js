@@ -1,4 +1,4 @@
-/* LIGHT NOVEL PARODY FACTORY — READER 11.0 · lazy chapter loading */
+/* LIGHT NOVEL PARODY FACTORY — READER 13.0 · lazy chapter loading */
 const id=new URLSearchParams(location.search).get('id');let novel,index=0,chapterList=[],currentChapter=null;
 const readerRoot=()=>document.getElementById('reader'),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),key=n=>'lnpf-reader-'+n+'-'+(novel?.id||'unknown');
 const getMarks=()=>JSON.parse(localStorage.getItem(key('bookmarks'))||'[]'),getNote=()=>localStorage.getItem(key('note-'+index))||'',saveMarks=v=>localStorage.setItem(key('bookmarks'),JSON.stringify(v));
