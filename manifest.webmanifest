@@ -26,5 +26,38 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Novel",
+      "short_name": "Create",
+      "url": "./create.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Library",
+      "short_name": "Library",
+      "url": "./library.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    "books",
+    "entertainment",
+    "writing"
+  ],
+  "lang": "en",
+  "dir": "ltr"
 }
