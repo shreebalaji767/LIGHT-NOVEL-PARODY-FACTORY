@@ -2,7 +2,7 @@
    Procedural long-form engine with continuity, anti-repetition, pacing and safe persistence.
 */
 const AUTHOR='BLLSNVJ21';
-const ENGINE_VERSION='14.0';
+const ENGINE_VERSION='14.1';
 const MAX_CHAPTERS=1000;
 const WORD_TARGET=800;
 const GENERATOR_YIELD=3;const GENRES=['Isekai','Fantasy','Action','Adventure','Romance','Comedy','Horror','Mystery','School','Villainess','Cultivation','Sci-Fi','Reincarnation','Game/System','Dungeon','Demon Lord','Slice of Life','Supernatural','Sports','Mecha','Magical Girl','Post-Apocalypse','Cyberpunk','Historical','Military','Cooking','Otome','Time Travel','Survival','Political Intrigue','Music','Western','Pirates','Steampunk','Urban Fantasy','Dark Fantasy'];
@@ -75,7 +75,8 @@ function renderBlueprint(bp){
 box('blueprint').onclick=()=>{box('status').textContent='Building story bible and continuity plan...';const bp=makeBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. The engine will prevent repetitive chapter construction.'};
 
 function createState(bp){return{chapter:0,arc:1,arcLength:Math.max(8,Math.ceil(bp.chapters/Math.min(12,Math.max(4,Math.ceil(bp.chapters/40))))),location:bp.locations[0],characters:bp.characters.map(c=>({...c,mood:'uncertain',goal:'understand what is happening',relationship:0})),unresolved:[...bp.hooks],resolved:[],foreshadow:[],recentTitles:[],recentPhrases:[],recentEvents:[],usedTitles:new Set(),usedEvents:new Set(),words:0};}
-function uniqueFrom(list,used){const seen=used instanceof Set?used:new Set(Array.isArray(used)?used:[]);const pool=list.filter(x=>!seen.has(x));return pick(pool.length?pool:list)}
+function asSet(value){return value instanceof Set?value:new Set(Array.isArray(value)?value:[])}
+function uniqueFrom(list,used){const seen=asSet(used);const pool=list.filter(x=>!seen.has(x));return pick(pool.length?pool:list)}
 function sentenceSet(state,bp,i){
  const char=pick(state.characters),other=pick(state.characters.filter(x=>x.name!==char.name)||state.characters),genre=pick(bp.genres),trope=char.trope,loc=state.location,object=pick(OBJECT),verb=pick(VERBS),conflict=uniqueFrom(CONFLICTS,state.usedEvents);
  state.usedEvents.add(conflict);state.recentEvents.push(conflict);if(state.recentEvents.length>10)state.recentEvents.shift();
@@ -131,14 +132,14 @@ async function generate(bp,resumeNovel=null,resumeState=null){
   for(let i=start;i<=n;i++){
    if(generationCancelled)throw new Error('Generation cancelled by user.');
    let chapter,attempt=0,accepted=false;
-   const baseState=JSON.stringify({...state,usedTitles:[...state.usedTitles],usedEvents:[...state.usedEvents]});
+   const baseState=JSON.stringify({...state,usedTitles:[...asSet(state.usedTitles)],usedEvents:[...asSet(state.usedEvents)]});
    const baseRng=RNG_STATE;const chapterStarted=Date.now();
    do{
     if(attempt>0){
       const restored=JSON.parse(baseState);
       Object.assign(state,restored);
-      state.usedTitles=new Set(restored.usedTitles||[]);
-      state.usedEvents=new Set(restored.usedEvents||[]);
+      state.usedTitles=asSet(restored.usedTitles);
+      state.usedEvents=asSet(restored.usedEvents);
       RNG_STATE=baseRng;
     }
     chapter=makeChapter(i,bp,state);attempt++;
