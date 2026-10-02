@@ -1,4 +1,4 @@
-const CACHE='lnpf-v18';
+const CACHE='lnpf-v19';
 const APP_SHELL=['./','./index.html','./create.html','./library.html','./reader.html','./css/jekyll.css','./js/storage.js','./js/app.js','./js/library.js','./js/reader.js','./js/pwa.js','./manifest.webmanifest','./icons/icon-192.svg','./icons/icon-512.svg','./offline.html'];
 const OFFLINE='./offline.html';
 const VERSION='14.0';
