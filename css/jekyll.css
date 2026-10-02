@@ -585,3 +585,60 @@ textarea{max-width:100%}
   html,body{overflow:visible!important}
   .masthead{position:static}
 }
+
+
+/* =========================================================
+   READER 15.0 — SCREEN-FIT CHAPTER READING
+   Chapters use the available screen width instead of a
+   portrait-style narrow column or multi-column layout.
+   ========================================================= */
+.reader{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding-left:clamp(14px,3vw,48px);
+  padding-right:clamp(14px,3vw,48px);
+}
+.reader-shell{
+  width:100%;
+  max-width:none;
+}
+.reader-head{
+  width:100%;
+  max-width:none;
+  margin-left:0;
+  margin-right:0;
+}
+.novel-text{
+  width:100%;
+  max-width:none;
+  margin-left:0;
+  margin-right:0;
+  columns:1!important;
+  column-count:1!important;
+  column-width:auto!important;
+  column-gap:0!important;
+  text-align:left;
+}
+.reader .controls{
+  width:100%;
+  max-width:none;
+  margin-left:0;
+  margin-right:0;
+}
+@media(min-width:1400px){
+  .reader{padding-left:3vw;padding-right:3vw}
+  .novel-text{font-size:clamp(20px,1.25vw,28px)}
+}
+@media(max-width:760px){
+  .reader{
+    padding-left:max(12px,env(safe-area-inset-left));
+    padding-right:max(12px,env(safe-area-inset-right));
+  }
+  .novel-text{
+    width:100%;
+    max-width:none;
+    font-size:calc(18px * var(--reader-scale,1));
+    line-height:1.85;
+  }
+}
