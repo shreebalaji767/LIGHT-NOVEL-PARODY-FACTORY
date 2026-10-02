@@ -75,7 +75,7 @@ function renderBlueprint(bp){
 box('blueprint').onclick=()=>{box('status').textContent='Building story bible and continuity plan...';const bp=makeBlueprint();renderBlueprint(bp);box('status').textContent='Blueprint complete. The engine will prevent repetitive chapter construction.'};
 
 function createState(bp){return{chapter:0,arc:1,arcLength:Math.max(8,Math.ceil(bp.chapters/Math.min(12,Math.max(4,Math.ceil(bp.chapters/40))))),location:bp.locations[0],characters:bp.characters.map(c=>({...c,mood:'uncertain',goal:'understand what is happening',relationship:0})),unresolved:[...bp.hooks],resolved:[],foreshadow:[],recentTitles:[],recentPhrases:[],recentEvents:[],usedTitles:new Set(),usedEvents:new Set(),words:0};}
-function uniqueFrom(list,used){const pool=list.filter(x=>!used.has(x));return pick(pool.length?pool:list)}
+function uniqueFrom(list,used){const source=Array.isArray(list)?list:[];const blocked=used instanceof Set?used:new Set(Array.isArray(used)?used:[]);const pool=source.filter(x=>!blocked.has(x));return pick(pool.length?pool:source)}
 function sentenceSet(state,bp,i){
  const char=pick(state.characters),other=pick(state.characters.filter(x=>x.name!==char.name)||state.characters),genre=pick(bp.genres),trope=char.trope,loc=state.location,object=pick(OBJECT),verb=pick(VERBS),conflict=uniqueFrom(CONFLICTS,state.usedEvents);
  state.usedEvents.add(conflict);state.recentEvents.push(conflict);if(state.recentEvents.length>10)state.recentEvents.shift();
