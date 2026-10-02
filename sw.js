@@ -1,4 +1,4 @@
-const CACHE='lnpf-v20';
+const CACHE='lnpf-v21';
 const APP_SHELL=['./','./index.html','./create.html','./library.html','./reader.html','./css/jekyll.css','./js/storage.js','./js/app.js','./js/library.js','./js/reader.js','./js/pwa.js','./manifest.webmanifest','./icons/icon-192.svg','./icons/icon-512.svg','./offline.html'];
 const OFFLINE='./offline.html';
 const VERSION='14.1';
@@ -18,14 +18,21 @@ self.addEventListener('message',event=>{
   if(event.data&&event.data.type==='GET_VERSION'&&event.ports?.[0]) event.ports[0].postMessage({version:VERSION,cache:CACHE});
 });
 
+async function cacheResponse(request,response){
+  if(!response||!response.ok)return;
+  try{
+    const copy=response.clone();
+    const cache=await caches.open(CACHE);
+    await cache.put(request,copy);
+  }catch{
+    // Caching must never break the response delivered to the page.
+  }
+}
+
 async function networkFirst(request){
   try{
     const response=await fetch(request);
-    if(response&&response.ok){
-      const cache=await caches.open(CACHE);
-      const copy=response.clone();
-      await cache.put(request,copy);
-    }
+    await cacheResponse(request,response);
     return response;
   }catch{
     return (await caches.match(request))||caches.match(OFFLINE);
@@ -35,11 +42,7 @@ async function networkFirst(request){
 async function staleWhileRevalidate(request){
   const cached=await caches.match(request);
   const update=fetch(request).then(async response=>{
-    if(response&&response.ok){
-      const copy=response.clone();
-      const cache=await caches.open(CACHE);
-      await cache.put(request,copy);
-    }
+    await cacheResponse(request,response);
     return response;
   }).catch(()=>cached);
   return cached||update;
