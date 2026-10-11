@@ -1,48 +1,66 @@
-# LIGHT NOVEL PARODY FACTORY
+# Light Novel Parody Factory
 
-**Factory 13.0** — a static, local-first light-novel parody studio with a gothic literary interface.
+**A browser-based studio for creating, generating, organizing, and reading original light-novel parodies.**  
+**Edition:** Factory 14.x · **Creator attribution:** BLLSNVJ21
+
+- [Open the repository](https://github.com/shreebalaji767/LIGHT-NOVEL-PARODY-FACTORY)
+- [Open the GitHub Pages site](https://shreebalaji767.github.io/LIGHT-NOVEL-PARODY-FACTORY/)
+
+## What it does
+
+- **Novel Factory:** configure a story and generate a long-form manuscript.
+- **Story planning:** build a story bible, seed, and blueprint before generation.
+- **Procedural writing:** reproducible seeds and resumable generation checkpoints.
+- **Local Library:** browse saved manuscripts in the browser.
+- **Lazy chapter reader:** load chapter content as needed instead of opening one giant manuscript object.
+- **Backup and restore:** export/import the versioned `LNPF-BACKUP` format.
+- **Progressive Web App:** installable app shell and offline support where the browser and hosting origin support them.
+- **Privacy-first storage:** no account or application server is required for the core local workflow.
+
+## Start using it
+
+1. Open the [site](https://shreebalaji767.github.io/LIGHT-NOVEL-PARODY-FACTORY/).
+2. Choose **Create a Novel** and configure the story.
+3. Review the story setup, then generate chapters.
+4. Open **Library** to revisit saved work.
+5. Export a backup periodically if the manuscripts matter to you.
+
+Serve the repository through an HTTP server when testing locally. Browser storage and service-worker/PWA features do not work reliably from a `file://` URL.
 
 ## Architecture
-- Static GitHub Pages compatible site
-- No backend
-- No server database
-- Browser-local IndexedDB persistence
-- PWA/offline app shell
-- Author attribution: **BLLSNVJ21**
-- Original procedural stories only
-- 200–1000 chapter configuration
-- Approximately 800 words per generated chapter
 
-## Story pipeline
+This is a static, client-side web application built with HTML, CSS, and JavaScript.
 
-**CONFIGURE → STORY BIBLE → SEED → BLUEPRINT → GENERATE → CHECKPOINT → RESUME → LIBRARY → READ**
+- `index.html` — landing page and entry points
+- `create.html` — story configuration and generation workflow
+- `library.html` — saved manuscript library
+- `reader.html` — chapter-by-chapter reader
+- `css/` — interface styling
+- `js/app.js` — procedural story engine and application logic
+- `js/pwa.js` — install/offline app controls
+- `sw.js` — service worker
+- `manifest.webmanifest` — PWA metadata
+- `icons/` — application icons
+- `robots.txt` and `sitemap.xml` — search crawler discovery
 
-The seeded engine makes procedural choices reproducible when the same seed is supplied. Generation checkpoints retain the story state and RNG state so interrupted generation can continue from the saved point.
+## Data, privacy, and backups
 
-## Storage 5.0 + Lazy Reader 13.0
+The core app stores manuscripts in browser-local IndexedDB. Manuscripts are not automatically synced to other devices or backed up to a server. Clearing site data, changing browsers, or using a different device can make local manuscripts unavailable. Export a backup and keep it somewhere safe.
 
-Large manuscripts are no longer stored as one giant IndexedDB object. The reader also loads only the chapter being read, while chapter titles/metadata are indexed separately.
+Generation is procedural and browser-side; it does not require a hosted AI API key. Review and edit generated text before publication.
 
-The browser database now uses:
-- `novels` — lightweight book metadata and generation state
-- `chapters` — one record per chapter, keyed by novel ID + chapter index
-- `chapterIndex` — lightweight chapter navigation metadata
-- `meta` — application metadata
+## Search indexing
 
-Existing schema-2/legacy chapter data are migrated automatically during the IndexedDB upgrade. Legacy v1 books are also imported when available.
+The repository includes root-level `robots.txt` and `sitemap.xml` for the GitHub Pages project URL. Submit the sitemap in Google Search Console after confirming the Pages URL is live. A sitemap helps discovery but does not guarantee indexing or ranking.
 
-The Library loads lightweight metadata for fast browsing. Full chapter data is assembled only when a book is opened or exported.
+## Development checklist
 
-## Backup
+- Test Create → Generate → Pause/Resume → Library → Reader.
+- Test backup export and import with a small manuscript first.
+- Verify storage migration with a copy of existing browser data before changing database schemas.
+- Check mobile layout, keyboard navigation, and print/export flows.
+- Validate `manifest.webmanifest`, service-worker caching, `robots.txt`, and `sitemap.xml` on the deployed site.
 
-Library export uses the versioned `LNPF-BACKUP` format and includes complete chapter data. Imports are validated before being written into the local chapter store.
+## Project scope
 
-## Run
-
-Serve with any static HTTP server. IndexedDB, service workers and PWA features should be tested from a served origin rather than `file://`.
-
-## WebAssembly direction
-
-The current generation engine is JavaScript and deliberately self-contained. A future experimental path can compile an isolated procedural engine to WebAssembly:
-
-**Engine → WebAssembly → browser**
+The core application runs without a backend or server database. Future hosted AI generation, account sync, or cloud storage should be optional services with clear privacy and cost disclosures.
